@@ -417,15 +417,15 @@ function App() {
             <dl className="profile-facts">
               <div>
                 <dt>Focus</dt>
-                <dd>Data Engineering · Analytics Engineering</dd>
+                <dd>Data Engineering Analytics Engineering</dd>
               </div>
               <div>
                 <dt>Tools</dt>
-                <dd>Python · SQL · Airflow · dbt · Spark · Kafka · PostgreSQL · MinIO</dd>
+                <dd>Python SQL Airflow dbt Spark Kafka PostgreSQL MinIO</dd>
               </div>
               <div>
                 <dt>Languages</dt>
-                <dd>English (fluent) · Dutch (basic)</dd>
+                <dd>English (fluent) Dutch (basic)</dd>
               </div>
               <div>
                 <dt>Currently</dt>
