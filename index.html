@@ -967,10 +967,42 @@
     } catch (_) {}
   }
 
+  const FALLBACK_LANGS = [
+    { lang: "Python", pct: 60 },
+    { lang: "C#",     pct: 40 },
+  ];
+
+  function renderLangChart(entries) {
+    const LANG_BAR_COLORS = {
+      Python: "#3572A5", "C#": "#178600", JavaScript: "#f1e05a",
+      TypeScript: "#3178c6", Shell: "#89e051", HTML: "#e34c26",
+    };
+    document.getElementById("langs-bars").innerHTML = entries.map(({ lang, pct }) => {
+      const color = LANG_BAR_COLORS[lang] || "#8b949e";
+      return `
+        <div class="lang-bar-row">
+          <div class="lang-bar-meta">
+            <span style="display:flex;align-items:center;gap:0.4rem">
+              <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block"></span>${lang}
+            </span>
+            <span>${pct}%</span>
+          </div>
+          <div class="lang-bar-track">
+            <div class="lang-bar-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  // Show fallback immediately so the chart is never empty
+  renderLangChart(FALLBACK_LANGS);
+
   async function loadRepos() {
     try {
       const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=pushed`);
       const repos = await res.json();
+
+      if (!Array.isArray(repos)) throw new Error("API error");
 
       const SKIP = [GITHUB_USER, "mintyfizz.github.io"];
       const shown = repos
@@ -987,33 +1019,19 @@
       const latest = repos.filter(r => r.pushed_at).sort((a,b) => new Date(b.pushed_at) - new Date(a.pushed_at))[0];
       if (latest) document.getElementById("stat-updated").textContent = timeAgo(latest.pushed_at);
 
-      // Build language chart from repos
-      const LANG_BAR_COLORS = {
-        Python: "#3572A5", "C#": "#178600", JavaScript: "#f1e05a",
-        TypeScript: "#3178c6", Shell: "#89e051", HTML: "#e34c26",
-      };
+      // Build language chart from live repo data
       const langCount = {};
       repos.filter(r => r.language).forEach(r => {
         langCount[r.language] = (langCount[r.language] || 0) + 1;
       });
       const total = Object.values(langCount).reduce((a, b) => a + b, 0);
-      const sorted = Object.entries(langCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
-      document.getElementById("langs-bars").innerHTML = sorted.map(([lang, count]) => {
-        const pct = Math.round((count / total) * 100);
-        const color = LANG_BAR_COLORS[lang] || "#8b949e";
-        return `
-          <div class="lang-bar-row">
-            <div class="lang-bar-meta">
-              <span style="display:flex;align-items:center;gap:0.4rem">
-                <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block"></span>${lang}
-              </span>
-              <span>${pct}%</span>
-            </div>
-            <div class="lang-bar-track">
-              <div class="lang-bar-fill" style="width:${pct}%;background:${color}"></div>
-            </div>
-          </div>`;
-      }).join("");
+      if (total > 0) {
+        const entries = Object.entries(langCount)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([lang, count]) => ({ lang, pct: Math.round((count / total) * 100) }));
+        renderLangChart(entries);
+      }
 
       const grid = document.getElementById("repos-grid");
       grid.innerHTML = shown.map(repo => {
