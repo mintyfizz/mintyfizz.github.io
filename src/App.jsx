@@ -354,7 +354,6 @@ function App() {
       <header className="nav">
         <a className="brand" href="#top" aria-label="Nathan Gatse home">
           <span className="brand-mark">NG</span>
-          <span>Nathan Gatse</span>
         </a>
         <nav aria-label="Primary navigation">
           <a href="#about">About</a>
