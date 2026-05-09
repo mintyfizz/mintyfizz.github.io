@@ -104,6 +104,16 @@ const PROJECTS = [
   },
 ];
 
+const PROJECT_FILTERS = [
+  { label: "All" },
+  { label: "Infrastructure", categories: ["Data platform", "Streaming"] },
+  { label: "Analytics", categories: ["Package"], tags: ["Analytics"] },
+  { label: "Applications", categories: ["Desktop app"] },
+  { label: "Learning", categories: ["Learning"] },
+];
+
+const FILTER_LABELS = PROJECT_FILTERS.map((filter) => filter.label);
+
 const ACTIVITY_TABS = [
   { id: "languages", label: "Languages" },
   { id: "recent-pushes", label: "Recent pushes" },
@@ -126,6 +136,16 @@ function timeAgo(dateStr) {
   if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
   if (diff < 31536000) return `${Math.floor(diff / 2592000)}mo ago`;
   return `${Math.floor(diff / 31536000)}y ago`;
+}
+
+function projectMatchesFilter(project, filterLabel) {
+  const filter = PROJECT_FILTERS.find(({ label }) => label === filterLabel);
+  if (!filter || filter.label === "All") return true;
+
+  return (
+    filter.categories?.includes(project.category) ||
+    filter.tags?.some((tag) => project.tags.includes(tag))
+  );
 }
 
 function GitHubIcon(props) {
@@ -317,32 +337,16 @@ function App() {
     };
   }, []);
 
-  const filters = useMemo(() => {
-    const categories = PROJECTS.map((project) => project.category);
-    const tags = PROJECTS.flatMap((project) => project.tags);
-    const preferredTags = ["Pipeline", "Analytics", "Desktop"];
-    return [
-      "All",
-      ...new Set([
-        ...categories,
-        ...preferredTags.filter((tag) => tags.includes(tag)),
-      ]),
-    ];
-  }, []);
-
   const visibleProjects = useMemo(() => {
-    if (activeFilter === "All") return PROJECTS;
-    return PROJECTS.filter((project) => project.category === activeFilter || project.tags.includes(activeFilter));
+    return PROJECTS.filter((project) => projectMatchesFilter(project, activeFilter));
   }, [activeFilter]);
 
   const selectedProject = PROJECTS.find((project) => project.name === selectedProjectName) || PROJECTS[0];
 
   function selectFilter(filter) {
     setActiveFilter(filter);
-    const nextProject = filter === "All"
-      ? PROJECTS[0]
-      : PROJECTS.find((project) => project.category === filter || project.tags.includes(filter));
-    if (nextProject) setSelectedProjectName(nextProject.name);
+    const nextProject = PROJECTS.find((project) => projectMatchesFilter(project, filter)) || PROJECTS[0];
+    setSelectedProjectName(nextProject.name);
   }
 
   return (
@@ -458,7 +462,7 @@ function App() {
           />
 
           <div className="filters" aria-label="Project filters">
-            {filters.map((filter) => (
+            {FILTER_LABELS.map((filter) => (
               <button
                 key={filter}
                 className={filter === activeFilter ? "active" : ""}
