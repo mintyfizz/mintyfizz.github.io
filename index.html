@@ -394,6 +394,50 @@
       display: block;
     }
 
+    .stats-card-custom {
+      background: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .stats-card-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+
+    .lang-bar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .lang-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .lang-bar-track {
+      height: 5px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .lang-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+
     .contrib-wrap {
       background: var(--card);
       border: 1px solid var(--border);
@@ -675,8 +719,8 @@
     <p class="hero-eyebrow">Aspiring Data Engineer</p>
     <h1>Nathan Gatse</h1>
     <p class="hero-bio" id="hero-bio">
-      Data Science student in Belgium. I build to learn.
-      From Congo, and that's where I want to take these skills.
+      Data Science student. Every side project somehow ends up being a pipeline.
+      At this point I've stopped fighting it.
     </p>
 
     <div class="stat-row" id="stat-row">
@@ -787,19 +831,14 @@
   <div class="stats-strip">
     <div class="stats-img-wrap">
       <img
-        id="stats-card"
-        src="https://github-readme-stats.vercel.app/api?username=mintyfizz&show_icons=true&theme=dark&bg_color=18181b&title_color=6ee7b7&icon_color=818cf8&text_color=a1a1aa&border_color=27272a&hide_border=false&rank_icon=github&include_all_commits=true&cache_seconds=3600"
-        alt="GitHub Stats"
+        src="https://streak-stats.demolab.com/?user=mintyfizz&theme=dark&background=18181b&border=27272a&stroke=27272a&ring=6ee7b7&fire=818cf8&currStreakLabel=6ee7b7&sideLabels=a1a1aa&dates=a1a1aa&currStreakNum=fafafa&sideNums=fafafa"
+        alt="GitHub Streak"
         onerror="this.parentElement.style.display='none'"
       />
     </div>
-    <div class="stats-img-wrap">
-      <img
-        id="langs-card"
-        src="https://github-readme-stats.vercel.app/api/top-langs/?username=mintyfizz&layout=compact&theme=dark&bg_color=18181b&title_color=6ee7b7&text_color=a1a1aa&border_color=27272a&hide_border=false&langs_count=6&cache_seconds=3600"
-        alt="Top Languages"
-        onerror="this.parentElement.style.display='none'"
-      />
+    <div class="stats-card-custom" id="langs-chart">
+      <div class="stats-card-title">Top Languages</div>
+      <div id="langs-bars"></div>
     </div>
   </div>
 
@@ -947,6 +986,34 @@
 
       const latest = repos.filter(r => r.pushed_at).sort((a,b) => new Date(b.pushed_at) - new Date(a.pushed_at))[0];
       if (latest) document.getElementById("stat-updated").textContent = timeAgo(latest.pushed_at);
+
+      // Build language chart from repos
+      const LANG_BAR_COLORS = {
+        Python: "#3572A5", "C#": "#178600", JavaScript: "#f1e05a",
+        TypeScript: "#3178c6", Shell: "#89e051", HTML: "#e34c26",
+      };
+      const langCount = {};
+      repos.filter(r => r.language).forEach(r => {
+        langCount[r.language] = (langCount[r.language] || 0) + 1;
+      });
+      const total = Object.values(langCount).reduce((a, b) => a + b, 0);
+      const sorted = Object.entries(langCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      document.getElementById("langs-bars").innerHTML = sorted.map(([lang, count]) => {
+        const pct = Math.round((count / total) * 100);
+        const color = LANG_BAR_COLORS[lang] || "#8b949e";
+        return `
+          <div class="lang-bar-row">
+            <div class="lang-bar-meta">
+              <span style="display:flex;align-items:center;gap:0.4rem">
+                <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block"></span>${lang}
+              </span>
+              <span>${pct}%</span>
+            </div>
+            <div class="lang-bar-track">
+              <div class="lang-bar-fill" style="width:${pct}%;background:${color}"></div>
+            </div>
+          </div>`;
+      }).join("");
 
       const grid = document.getElementById("repos-grid");
       grid.innerHTML = shown.map(repo => {
