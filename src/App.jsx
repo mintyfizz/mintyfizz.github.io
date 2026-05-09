@@ -428,7 +428,7 @@ function App() {
               </div>
               <div>
                 <dt>Languages</dt>
-                <dd>English (fluent) Dutch (basic)</dd>
+                <dd>English (fluent) French (fluent) Dutch (basic)</dd>
               </div>
               <div>
                 <dt>Currently</dt>
