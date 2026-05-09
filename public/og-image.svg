@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#090807"/>
+  <path d="M70 82h1060" stroke="#7b4c36" stroke-width="2"/>
+  <text x="80" y="175" fill="#e9ddd1" font-family="Georgia, serif" font-size="92">Nathan Gatse</text>
+  <text x="84" y="238" fill="#c5b6a6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="26">Data systems. Pipelines. Production-ready assets.</text>
+  <g transform="translate(630 180)" fill="none" stroke="#7b4c36" stroke-width="2">
+    <rect x="0" y="0" width="430" height="220"/>
+    <path d="M30 60 C130 60 140 90 210 90 S310 132 400 132"/>
+    <path d="M30 88 C150 88 150 80 218 116 S318 148 400 148"/>
+    <path d="M30 116 C145 116 166 130 230 130 S320 166 400 166"/>
+    <path d="M30 144 C122 144 170 150 238 150 S325 184 400 184"/>
+    <circle cx="270" cy="136" r="4" fill="#84c7a8" stroke="none"/>
+    <circle cx="170" cy="88" r="3" fill="#d1a07c" stroke="none"/>
+  </g>
+  <text x="82" y="535" fill="#84c7a8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="26">github.com/mintyfizz</text>
+</svg>
