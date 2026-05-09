@@ -912,42 +912,59 @@
   const GITHUB_USER = "mintyfizz";
 
   const LANG_COLORS = {
-    Python: "#3572A5",
-    "C#": "#178600",
-    JavaScript: "#f1e05a",
-    TypeScript: "#3178c6",
-    Shell: "#89e051",
-    HTML: "#e34c26",
+    Python: "#3572A5", "C#": "#178600", JavaScript: "#f1e05a",
+    TypeScript: "#3178c6", Shell: "#89e051", HTML: "#e34c26",
   };
 
-  const REPO_META = {
-    "telco-regulator-pipeline": {
+  // Static project data — always renders, no API needed
+  const PROJECTS = [
+    {
+      name: "telco-regulator-pipeline",
+      url: "https://github.com/mintyfizz/telco-regulator-pipeline",
       desc: "Open-source reference data platform for telecoms sector regulation. Synthetic operator submissions, PostgreSQL medallion warehouse, MinIO object storage, and Airflow orchestration — calibrated to a Republic of Congo market structure.",
+      lang: "Python",
       tags: ["Airflow", "dbt", "PostgreSQL", "MinIO", "Docker"],
+      stars: 1,
       featured: true,
     },
-    "realtime-data-platform": {
+    {
+      name: "realtime-data-platform",
+      url: "https://github.com/mintyfizz/realtime-data-platform",
       desc: "End-to-end real-time pipeline: Kafka producers feed user events, Spark Structured Streaming transforms them, results land in Cassandra — orchestrated by Airflow.",
+      lang: "Python",
       tags: ["Kafka", "Spark", "Cassandra", "Airflow", "Docker"],
+      stars: 0,
     },
-    "NatuurSpotter": {
+    {
+      name: "NatuurSpotter",
+      url: "https://github.com/mintyfizz/NatuurSpotter",
       desc: "Published Python package for collecting and analysing moth observation data from waarnemingen.be. Generates biodiversity CSVs, interactive Folium maps, PDF species reports, and seasonal charts — with optional LLM interpretation.",
+      lang: "Python",
       tags: ["PyPI", "Biodiversity", "Data Analysis", "LLM"],
+      stars: 0,
     },
-    "spotify-inspiration-lab-staged": {
-      desc: "Console-based C# app modelling core Spotify concepts — songs, albums, artists, playlists, and favourites — with seeded demo data and an intentionally staged commit history.",
-      tags: [".NET 9", "OOP"],
-    },
-    "Smart-Meal-Fitness-Tracker": {
-      desc: "Windows desktop app (WPF / .NET 8) for tracking meals, activities, weight, and calorie goals. Integrates Supabase for auth and storage, USDA FoodData Central for nutritional data, and Google Gemini 2.5 Flash for AI-powered personalised meal recommendations.",
+    {
+      name: "Smart-Meal-Fitness-Tracker",
+      url: "https://github.com/mintyfizz/Smart-Meal-Fitness-Tracker",
+      desc: "Windows desktop app (WPF / .NET 8) for tracking meals, activities, weight, and calorie goals. Integrates Supabase for auth and storage, USDA FoodData Central for nutritional data, and Google Gemini 2.5 Flash for AI-powered meal recommendations.",
+      lang: "C#",
       tags: ["WPF", ".NET 8", "Supabase", "Gemini AI", "USDA API"],
+      stars: 0,
     },
-  };
+    {
+      name: "spotify-inspiration-lab-staged",
+      url: "https://github.com/mintyfizz/spotify-inspiration-lab-staged",
+      desc: "Console-based C# app modelling core Spotify concepts — songs, albums, artists, playlists, and favourites — with seeded demo data and an intentionally staged commit history.",
+      lang: "C#",
+      tags: [".NET 9", "OOP"],
+      stars: 0,
+    },
+  ];
 
   function timeAgo(dateStr) {
+    if (!dateStr) return "";
     const d = new Date(dateStr);
-    const now = new Date();
-    const diff = Math.floor((now - d) / 1000);
+    const diff = Math.floor((new Date() - d) / 1000);
     if (diff < 60) return `${diff}s ago`;
     if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
     if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
@@ -956,29 +973,40 @@
     return `${Math.floor(diff/31536000)}y ago`;
   }
 
-  async function loadProfile() {
-    try {
-      const res = await fetch(`https://api.github.com/users/${GITHUB_USER}`);
-      const user = await res.json();
-      document.getElementById("stat-repos").textContent = user.public_repos;
-      if (user.bio) {
-        document.getElementById("hero-bio").textContent = user.bio;
-      }
-    } catch (_) {}
+  function repoCard(p) {
+    const color = LANG_COLORS[p.lang] || "#8b949e";
+    const langChip = p.lang
+      ? `<span class="lang-chip"><span class="lang-dot" style="background:${color}"></span>${p.lang}</span>`
+      : "";
+    const starsBadge = p.stars > 0
+      ? `<span class="repo-stars" id="stars-${p.name}"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>${p.stars}</span>`
+      : `<span class="repo-stars" id="stars-${p.name}" style="display:none"></span>`;
+    const tags = p.tags.map(t => `<span class="tag">${t}</span>`).join("");
+    return `
+      <a href="${p.url}" target="_blank" rel="noopener" class="repo-card">
+        <div class="repo-top">
+          <div class="repo-icon-name">
+            <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 010-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5zm10.5-1h-8a1 1 0 00-1 1v6.708A2.486 2.486 0 014.5 9h8z"/></svg>
+            <span class="repo-name">${p.name}</span>
+          </div>
+          ${starsBadge}
+        </div>
+        <p class="repo-desc">${p.desc}</p>
+        <div class="repo-footer">
+          ${langChip}
+          <div class="tags">${tags}</div>
+          <span class="updated" id="updated-${p.name}"></span>
+        </div>
+      </a>`;
   }
 
-  const FALLBACK_LANGS = [
-    { lang: "Python", pct: 60 },
-    { lang: "C#",     pct: 40 },
-  ];
+  // Render projects immediately — no API dependency
+  document.getElementById("repos-grid").innerHTML = PROJECTS.map(repoCard).join("");
 
+  // Language chart — static, always visible
   function renderLangChart(entries) {
-    const LANG_BAR_COLORS = {
-      Python: "#3572A5", "C#": "#178600", JavaScript: "#f1e05a",
-      TypeScript: "#3178c6", Shell: "#89e051", HTML: "#e34c26",
-    };
     document.getElementById("langs-bars").innerHTML = entries.map(({ lang, pct }) => {
-      const color = LANG_BAR_COLORS[lang] || "#8b949e";
+      const color = LANG_COLORS[lang] || "#8b949e";
       return `
         <div class="lang-bar-row">
           <div class="lang-bar-meta">
@@ -994,83 +1022,63 @@
     }).join("");
   }
 
-  // Show fallback immediately so the chart is never empty
-  renderLangChart(FALLBACK_LANGS);
+  renderLangChart([
+    { lang: "Python", pct: 60 },
+    { lang: "C#",     pct: 40 },
+  ]);
 
-  async function loadRepos() {
+  // Enrich with live GitHub data (stars, timestamps, repo count)
+  async function enrichFromGitHub() {
     try {
-      const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=pushed`);
-      const repos = await res.json();
+      const [userRes, reposRes] = await Promise.all([
+        fetch(`https://api.github.com/users/${GITHUB_USER}`),
+        fetch(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100`),
+      ]);
+      const user  = await userRes.json();
+      const repos = await reposRes.json();
 
-      if (!Array.isArray(repos)) throw new Error("API error");
+      if (user.public_repos) document.getElementById("stat-repos").textContent = user.public_repos;
+      if (!Array.isArray(repos)) return;
 
-      const SKIP = [GITHUB_USER, "mintyfizz.github.io"];
-      const shown = repos
-        .filter(r => !r.archived && !SKIP.includes(r.name) && (!r.fork || REPO_META[r.name]))
-        .sort((a, b) => {
-          const af = REPO_META[a.name]?.featured ? 1 : 0;
-          const bf = REPO_META[b.name]?.featured ? 1 : 0;
-          return bf - af || b.stargazers_count - a.stargazers_count;
-        });
-
-      const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
+      // Update stars pill
+      const totalStars = repos.reduce((s, r) => s + (r.stargazers_count || 0), 0);
       document.getElementById("stat-stars").textContent = totalStars;
 
-      const latest = repos.filter(r => r.pushed_at).sort((a,b) => new Date(b.pushed_at) - new Date(a.pushed_at))[0];
+      // Update last push pill
+      const latest = repos.filter(r => r.pushed_at).sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))[0];
       if (latest) document.getElementById("stat-updated").textContent = timeAgo(latest.pushed_at);
 
-      // Build language chart from live repo data
+      // Update per-card stars and timestamps
+      repos.forEach(r => {
+        const starEl = document.getElementById(`stars-${r.name}`);
+        if (starEl) {
+          if (r.stargazers_count > 0) {
+            starEl.style.display = "flex";
+            starEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>${r.stargazers_count}`;
+          }
+        }
+        const updEl = document.getElementById(`updated-${r.name}`);
+        if (updEl && r.pushed_at) updEl.textContent = timeAgo(r.pushed_at);
+      });
+
+      // Refine language chart from live data
       const langCount = {};
       repos.filter(r => r.language).forEach(r => {
         langCount[r.language] = (langCount[r.language] || 0) + 1;
       });
       const total = Object.values(langCount).reduce((a, b) => a + b, 0);
       if (total > 0) {
-        const entries = Object.entries(langCount)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([lang, count]) => ({ lang, pct: Math.round((count / total) * 100) }));
-        renderLangChart(entries);
+        renderLangChart(
+          Object.entries(langCount)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([lang, count]) => ({ lang, pct: Math.round((count / total) * 100) }))
+        );
       }
-
-      const grid = document.getElementById("repos-grid");
-      grid.innerHTML = shown.map(repo => {
-        const meta = REPO_META[repo.name] || {};
-        const desc = meta.desc || repo.description || "No description.";
-        const tags = (meta.tags || []).map(t => `<span class="tag">${t}</span>`).join("");
-        const lang = repo.language || "";
-        const dotColor = LANG_COLORS[lang] || "#8b949e";
-        const langChip = lang
-          ? `<span class="lang-chip"><span class="lang-dot" style="background:${dotColor}"></span>${lang}</span>`
-          : "";
-        const stars = repo.stargazers_count > 0
-          ? `<span class="repo-stars"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>${repo.stargazers_count}</span>`
-          : "";
-
-        return `
-          <a href="${repo.html_url}" target="_blank" rel="noopener" class="repo-card">
-            <div class="repo-top">
-              <div class="repo-icon-name">
-                <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 010-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5zm10.5-1h-8a1 1 0 00-1 1v6.708A2.486 2.486 0 014.5 9h8z"/></svg>
-                <span class="repo-name">${repo.name}</span>
-              </div>
-              ${stars}
-            </div>
-            <p class="repo-desc">${desc}</p>
-            <div class="repo-footer">
-              ${langChip}
-              <div class="tags">${tags}</div>
-              <span class="updated">${timeAgo(repo.pushed_at)}</span>
-            </div>
-          </a>`;
-      }).join("");
-    } catch (_) {
-      document.getElementById("repos-grid").innerHTML = `<p style="color:var(--muted)">Could not load repos.</p>`;
-    }
+    } catch (_) {}
   }
 
-  loadProfile();
-  loadRepos();
+  enrichFromGitHub();
 </script>
 </body>
 </html>
