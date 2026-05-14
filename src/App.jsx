@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const GITHUB_USER = "mintyfizz";
 const CONTACT = {
@@ -19,16 +19,33 @@ const LANG_COLORS = {
 };
 
 const STATIC_STATS = {
-  repos: "5+",
+  repos: "7",
   stars: "1",
-  latestPush: "Unavailable",
+  latestPush: "May 12, 2026",
 };
 
-const PROJECTS = [
+const CURATED_PROJECTS = [
+  {
+    name: "cemac-data-observatory",
+    url: "https://github.com/mintyfizz/cemac-data-observatory",
+    category: "Open data pipeline",
+    featured: true,
+    language: "Python",
+    summary:
+      "Containerized digital readiness pipeline for CEMAC country indicators.",
+    longDescription:
+      "Pulls World Bank indicators for six CEMAC countries plus Rwanda and Kenya into Postgres, transforms them with dbt, orchestrates weekly Prefect runs, and serves Metabase dashboard-ready marts.",
+    stack: ["Python", "Prefect", "dbt", "PostgreSQL", "Metabase", "Docker"],
+    tags: ["Pipeline", "Warehouse", "Open data"],
+    outcome:
+      "Creates a repeatable observatory for infrastructure gaps and benchmark trends across regional digital indicators.",
+    role: "Built the extraction flow, warehouse models, orchestration, dashboard layer, and local Docker stack.",
+    stars: 0,
+  },
   {
     name: "telco-regulator-pipeline",
     url: "https://github.com/mintyfizz/telco-regulator-pipeline",
-    category: "Data platform",
+    category: "Regulatory platform",
     featured: true,
     language: "Python",
     summary:
@@ -38,14 +55,14 @@ const PROJECTS = [
     stack: ["Python", "Airflow", "dbt", "PostgreSQL", "MinIO", "Docker"],
     tags: ["Pipeline", "Warehouse", "Regulatory data"],
     outcome:
-      "Flagship project showing generation, ingestion, validation, quality events, and analytics-ready marts.",
+      "Shows generation, ingestion, validation, quality events, and analytics-ready marts for a regulator-side workflow.",
     role: "Designed the generator, warehouse layers, validation rules, and orchestration path.",
     stars: 1,
   },
   {
     name: "realtime-data-platform",
     url: "https://github.com/mintyfizz/realtime-data-platform",
-    category: "Streaming",
+    category: "Streaming pipeline",
     language: "Python",
     summary:
       "End-to-end real-time pipeline for user-event processing.",
@@ -60,7 +77,7 @@ const PROJECTS = [
   {
     name: "NatuurSpotter",
     url: "https://github.com/mintyfizz/NatuurSpotter",
-    category: "Package",
+    category: "Biodiversity analytics",
     language: "Python",
     summary:
       "Published Python package for moth observation data and biodiversity reporting.",
@@ -75,7 +92,7 @@ const PROJECTS = [
   {
     name: "Smart-Meal-Fitness-Tracker",
     url: "https://github.com/mintyfizz/Smart-Meal-Fitness-Tracker",
-    category: "Desktop app",
+    category: "Desktop application",
     language: "C#",
     summary:
       "Windows desktop app for tracking meals, activities, weight, and calorie goals.",
@@ -90,7 +107,7 @@ const PROJECTS = [
   {
     name: "spotify-inspiration-lab-staged",
     url: "https://github.com/mintyfizz/spotify-inspiration-lab-staged",
-    category: "Learning",
+    category: "Learning project",
     language: "C#",
     summary:
       "Console-based C# app modelling core Spotify domain concepts.",
@@ -104,12 +121,35 @@ const PROJECTS = [
   },
 ];
 
+const PORTFOLIO_REPO = `${GITHUB_USER}.github.io`;
+const CURATED_PROJECT_NAMES = new Set(CURATED_PROJECTS.map((project) => project.name));
+
 const PROJECT_FILTERS = [
   { label: "All" },
-  { label: "Infrastructure", categories: ["Data platform", "Streaming"] },
-  { label: "Analytics", categories: ["Package"], tags: ["Analytics"] },
-  { label: "Applications", categories: ["Desktop app"] },
-  { label: "Learning", categories: ["Learning"] },
+  {
+    label: "Infrastructure",
+    categories: ["Open data pipeline", "Regulatory platform", "Streaming pipeline", "Data pipeline"],
+    tags: ["Pipeline", "Warehouse", "Data Engineering", "ETL", "dbt", "Airflow"],
+  },
+  {
+    label: "Analytics",
+    categories: ["Open data pipeline", "Biodiversity analytics", "Analytics project"],
+    tags: ["Analytics", "Open data", "Biodiversity"],
+  },
+  {
+    label: "Applications",
+    categories: ["Desktop application", "Application"],
+    tags: ["Desktop", "WPF", "React"],
+  },
+  {
+    label: "Learning",
+    categories: ["Learning project"],
+    tags: ["Learning", "OOP", "Console app"],
+  },
+  {
+    label: "Other",
+    other: true,
+  },
 ];
 
 const FILTER_LABELS = PROJECT_FILTERS.map((filter) => filter.label);
@@ -120,12 +160,226 @@ const ACTIVITY_TABS = [
   { id: "contributions", label: "Contributions" },
 ];
 
-const FALLBACK_RECENT = PROJECTS.slice(0, 4).map((project) => ({
+const CONTRIBUTION_WEEKS = 32;
+
+const FALLBACK_CONTRIBUTIONS = [
+  { date: "2026-05-12T08:56:27Z", count: 1 },
+  { date: "2026-05-09T15:42:23Z", count: 1 },
+  { date: "2026-05-09T15:22:44Z", count: 1 },
+  { date: "2026-05-09T15:14:02Z", count: 1 },
+  { date: "2026-05-02T22:59:57Z", count: 1 },
+  { date: "2026-04-20T02:16:30Z", count: 1 },
+  { date: "2026-03-25T11:11:58Z", count: 1 },
+];
+
+const FALLBACK_RECENT = CURATED_PROJECTS.slice(0, 4).map((project) => ({
   name: project.name,
   pushedAt: "",
   description: project.summary,
   url: project.url,
 }));
+
+function titleFromSlug(value) {
+  return value
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function topicToLabel(topic) {
+  const specialLabels = {
+    airflow: "Airflow",
+    analytics: "Analytics",
+    dbt: "dbt",
+    docker: "Docker",
+    etl: "ETL",
+    postgresql: "PostgreSQL",
+    python: "Python",
+    react: "React",
+    wpf: "WPF",
+  };
+
+  return specialLabels[topic] || titleFromSlug(topic);
+}
+
+function uniqueList(items) {
+  return [...new Set(items.filter(Boolean))];
+}
+
+function deriveProjectCategory(repo) {
+  const name = repo.name.toLowerCase();
+  const topics = repo.topics || [];
+
+  if (name.includes("realtime") || topics.some((topic) => ["kafka", "spark", "streaming"].includes(topic))) {
+    return "Streaming pipeline";
+  }
+
+  if (name.includes("pipeline") || topics.some((topic) => ["data-pipeline", "etl", "airflow", "dbt"].includes(topic))) {
+    return "Data pipeline";
+  }
+
+  if (topics.some((topic) => ["analytics", "biodiversity", "open-data"].includes(topic))) {
+    return "Analytics project";
+  }
+
+  if (repo.language === "C#" || topics.some((topic) => ["wpf", "desktop"].includes(topic))) {
+    return name.includes("lab") || name.includes("staged") ? "Learning project" : "Desktop application";
+  }
+
+  if (repo.language === "JavaScript" || repo.language === "TypeScript") {
+    return "Application";
+  }
+
+  return repo.language ? `${repo.language} project` : "GitHub project";
+}
+
+function deriveProjectTags(repo) {
+  return uniqueList([
+    repo.language,
+    ...(repo.topics || []).slice(0, 5).map(topicToLabel),
+  ]).slice(0, 6);
+}
+
+function deriveProjectStack(repo) {
+  const stack = deriveProjectTags(repo);
+  return stack.length ? stack : ["GitHub"];
+}
+
+function shouldDisplayRepo(repo) {
+  if (repo.name === PORTFOLIO_REPO || repo.archived || repo.disabled) return false;
+  return !repo.fork || CURATED_PROJECT_NAMES.has(repo.name);
+}
+
+function repoToProject(repo, curated) {
+  const category = curated?.category || deriveProjectCategory(repo);
+  const summary = repo.description || curated?.summary || `${titleFromSlug(repo.name)} on GitHub.`;
+
+  return {
+    name: repo.name,
+    url: repo.html_url,
+    category,
+    featured: Boolean(curated?.featured),
+    language: curated?.language || repo.language || "GitHub",
+    summary,
+    longDescription:
+      curated?.longDescription ||
+      repo.description ||
+      "Auto-synced public GitHub project. Add a repository description and topics on GitHub to make this card more specific.",
+    stack: curated?.stack || deriveProjectStack(repo),
+    tags: curated?.tags || deriveProjectTags(repo),
+    outcome:
+      curated?.outcome ||
+      "Appears automatically from GitHub and updates when the public repository metadata changes.",
+    role: curated?.role || "Repository metadata is pulled from GitHub at page load.",
+    stars: repo.stargazers_count || 0,
+    pushedAt: repo.pushed_at || "",
+    updatedAt: repo.updated_at || "",
+    order: curated ? CURATED_PROJECTS.findIndex((project) => project.name === curated.name) : CURATED_PROJECTS.length,
+  };
+}
+
+function buildProjectsFromRepos(repos) {
+  const curatedByName = new Map(CURATED_PROJECTS.map((project) => [project.name, project]));
+  const syncedProjects = repos
+    .filter(shouldDisplayRepo)
+    .map((repo) => repoToProject(repo, curatedByName.get(repo.name)));
+
+  const syncedNames = new Set(syncedProjects.map((project) => project.name));
+  const missingCuratedProjects = CURATED_PROJECTS.filter((project) => !syncedNames.has(project.name));
+
+  return [...syncedProjects, ...missingCuratedProjects].sort((a, b) => {
+    const timeA = new Date(a.pushedAt || a.updatedAt || 0).getTime();
+    const timeB = new Date(b.pushedAt || b.updatedAt || 0).getTime();
+    if (timeA !== timeB) return timeB - timeA;
+    return (a.order ?? CURATED_PROJECTS.length) - (b.order ?? CURATED_PROJECTS.length);
+  });
+}
+
+async function fetchGitHubRepos() {
+  const repos = [];
+  let page = 1;
+
+  while (page <= 10) {
+    const response = await fetch(
+      `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=pushed&page=${page}`,
+    );
+    if (!response.ok) throw new Error("Unable to fetch GitHub repositories");
+
+    const pageRepos = await response.json();
+    if (!Array.isArray(pageRepos) || pageRepos.length === 0) break;
+
+    repos.push(...pageRepos);
+    if (pageRepos.length < 100) break;
+    page += 1;
+  }
+
+  return repos;
+}
+
+function toDayKey(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+}
+
+function formatContributionDate(date) {
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+function buildContributionWeeks(activity) {
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const start = new Date(today);
+  start.setUTCDate(today.getUTCDate() - ((CONTRIBUTION_WEEKS - 1) * 7 + today.getUTCDay()));
+
+  const counts = activity.reduce((map, item) => {
+    const key = toDayKey(item.date);
+    if (!key) return map;
+    const day = new Date(`${key}T00:00:00Z`);
+    if (day < start || day > today) return map;
+    map.set(key, (map.get(key) || 0) + Math.max(1, item.count || 1));
+    return map;
+  }, new Map());
+
+  return Array.from({ length: CONTRIBUTION_WEEKS }, (_, weekIndex) => ({
+    key: `week-${weekIndex}`,
+    days: Array.from({ length: 7 }, (_, dayIndex) => {
+      const date = new Date(start);
+      date.setUTCDate(start.getUTCDate() + weekIndex * 7 + dayIndex);
+      const key = toDayKey(date);
+      const isFuture = date > today;
+      const count = isFuture ? 0 : counts.get(key) || 0;
+      const level = count === 0 ? 0 : Math.min(4, Math.ceil(Math.log2(count + 1)));
+
+      return {
+        key,
+        count,
+        level,
+        isFuture,
+        label: formatContributionDate(date),
+      };
+    }),
+  }));
+}
+
+function summarizeContributionWeeks(weeks) {
+  return weeks.reduce(
+    (summary, week) => {
+      week.days.forEach((day) => {
+        if (day.count > 0) {
+          summary.total += day.count;
+          summary.activeDays += 1;
+        }
+      });
+      return summary;
+    },
+    { total: 0, activeDays: 0 },
+  );
+}
 
 function timeAgo(dateStr) {
   if (!dateStr) return "Curated";
@@ -141,10 +395,16 @@ function timeAgo(dateStr) {
 function projectMatchesFilter(project, filterLabel) {
   const filter = PROJECT_FILTERS.find(({ label }) => label === filterLabel);
   if (!filter || filter.label === "All") return true;
+  if (filter.other) {
+    return !PROJECT_FILTERS.some((candidate) => {
+      return candidate.label !== "All" && !candidate.other && projectMatchesFilter(project, candidate.label);
+    });
+  }
 
+  const projectTags = project.tags || [];
   return (
     filter.categories?.includes(project.category) ||
-    filter.tags?.some((tag) => project.tags.includes(tag))
+    filter.tags?.some((tag) => projectTags.includes(tag))
   );
 }
 
@@ -187,15 +447,19 @@ function ArrowIcon(props) {
   );
 }
 
-function SystemMap() {
+function SystemMap({ latestPush, projectCount }) {
   const lines = Array.from({ length: 12 }, (_, index) => ({
     y: 52 + index * 17,
     endY: 92 + Math.abs(index - 5) * 5,
   }));
 
   return (
-    <div className="system-map" aria-hidden="true">
+    <div className="system-map" role="img" aria-label="GitHub project sync signal">
       <div className="map-label map-label-top">DATA IN</div>
+      <div className="map-signal map-signal-left">
+        <span>Projects synced</span>
+        <strong>{projectCount}</strong>
+      </div>
       <svg viewBox="0 0 620 310" preserveAspectRatio="none">
         <defs>
           <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
@@ -231,6 +495,10 @@ function SystemMap() {
           </g>
         ))}
       </svg>
+      <div className="map-signal map-signal-right">
+        <span>Latest push</span>
+        <strong>{latestPush}</strong>
+      </div>
       <div className="map-label map-label-bottom">TRUSTED DATA OUT</div>
     </div>
   );
@@ -248,56 +516,50 @@ function SectionTitle({ number, title, action }) {
 
 function App() {
   const [githubStats, setGithubStats] = useState(STATIC_STATS);
-  const [repoDetails, setRepoDetails] = useState({});
+  const [projects, setProjects] = useState(CURATED_PROJECTS);
   const [languageStats, setLanguageStats] = useState([
     { lang: "Python", pct: 60 },
     { lang: "C#", pct: 40 },
   ]);
   const [recentRepos, setRecentRepos] = useState(FALLBACK_RECENT);
+  const [contributionActivity, setContributionActivity] = useState(FALLBACK_CONTRIBUTIONS);
   const [activeFilter, setActiveFilter] = useState("All");
-  const [selectedProjectName, setSelectedProjectName] = useState(PROJECTS[0].name);
+  const [selectedProjectName, setSelectedProjectName] = useState(CURATED_PROJECTS[0].name);
   const [activityTab, setActivityTab] = useState(ACTIVITY_TABS[0].id);
+  const projectDetailRef = useRef(null);
+  const userSelectedProjectRef = useRef(false);
 
   useEffect(() => {
     let ignore = false;
 
     async function enrichFromGitHub() {
       try {
-        const [userRes, reposRes] = await Promise.all([
-          fetch(`https://api.github.com/users/${GITHUB_USER}`),
-          fetch(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100`),
-        ]);
-        if (!userRes.ok || !reposRes.ok) return;
-
-        const [user, repos] = await Promise.all([userRes.json(), reposRes.json()]);
+        const repos = await fetchGitHubRepos();
         if (ignore || !Array.isArray(repos)) return;
 
-        const totalStars = repos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0);
-        const latest = [...repos]
+        const displayRepos = repos.filter(shouldDisplayRepo);
+        const totalStars = displayRepos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0);
+        const latest = [...displayRepos]
           .filter((repo) => repo.pushed_at)
           .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))[0];
 
         setGithubStats({
-          repos: user.public_repos ? String(user.public_repos) : STATIC_STATS.repos,
+          repos: displayRepos.length ? String(displayRepos.length) : STATIC_STATS.repos,
           stars: String(totalStars),
           latestPush: latest ? timeAgo(latest.pushed_at) : STATIC_STATS.latestPush,
         });
 
-        setRepoDetails(
-          Object.fromEntries(
-            repos.map((repo) => [
-              repo.name,
-              {
-                stars: repo.stargazers_count || 0,
-                pushedAt: repo.pushed_at || "",
-                language: repo.language || "",
-                description: repo.description || "",
-              },
-            ]),
-          ),
-        );
+        const nextProjects = buildProjectsFromRepos(repos);
+        setProjects(nextProjects);
+        setSelectedProjectName((currentProjectName) => {
+          if (userSelectedProjectRef.current && nextProjects.some((project) => project.name === currentProjectName)) {
+            return currentProjectName;
+          }
 
-        const languageCounts = repos.reduce((counts, repo) => {
+          return nextProjects[0]?.name || currentProjectName;
+        });
+
+        const languageCounts = displayRepos.reduce((counts, repo) => {
           if (repo.language) counts[repo.language] = (counts[repo.language] || 0) + 1;
           return counts;
         }, {});
@@ -315,7 +577,7 @@ function App() {
         }
 
         setRecentRepos(
-          [...repos]
+          [...displayRepos]
             .filter((repo) => repo.pushed_at)
             .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))
             .slice(0, 5)
@@ -326,6 +588,11 @@ function App() {
               url: repo.html_url,
             })),
         );
+
+        const repoActivity = displayRepos
+          .filter((repo) => repo.pushed_at)
+          .map((repo) => ({ date: repo.pushed_at, count: 1 }));
+        setContributionActivity(repoActivity);
       } catch {
         // Static curated content is the product experience; GitHub data only enriches it.
       }
@@ -338,15 +605,40 @@ function App() {
   }, []);
 
   const visibleProjects = useMemo(() => {
-    return PROJECTS.filter((project) => projectMatchesFilter(project, activeFilter));
-  }, [activeFilter]);
+    return projects.filter((project) => projectMatchesFilter(project, activeFilter));
+  }, [activeFilter, projects]);
 
-  const selectedProject = PROJECTS.find((project) => project.name === selectedProjectName) || PROJECTS[0];
+  useEffect(() => {
+    if (!visibleProjects.length) return;
+    if (!visibleProjects.some((project) => project.name === selectedProjectName)) {
+      setSelectedProjectName(visibleProjects[0].name);
+    }
+  }, [selectedProjectName, visibleProjects]);
+
+  const selectedProject =
+    projects.find((project) => project.name === selectedProjectName) ||
+    visibleProjects[0] ||
+    projects[0] ||
+    CURATED_PROJECTS[0];
+  const contributionWeeks = useMemo(() => buildContributionWeeks(contributionActivity), [contributionActivity]);
+  const contributionSummary = useMemo(() => summarizeContributionWeeks(contributionWeeks), [contributionWeeks]);
 
   function selectFilter(filter) {
+    userSelectedProjectRef.current = true;
     setActiveFilter(filter);
-    const nextProject = PROJECTS.find((project) => projectMatchesFilter(project, filter)) || PROJECTS[0];
+    const nextProject = projects.find((project) => projectMatchesFilter(project, filter)) || projects[0] || CURATED_PROJECTS[0];
     setSelectedProjectName(nextProject.name);
+  }
+
+  function selectProject(projectName) {
+    userSelectedProjectRef.current = true;
+    setSelectedProjectName(projectName);
+
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 720px)").matches) {
+      window.requestAnimationFrame(() => {
+        projectDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }
 
   return (
@@ -367,10 +659,6 @@ function App() {
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero-copy">
             <h1 id="hero-title">Nathan Gatse</h1>
-            <p className="hero-summary">
-              Data Science student building reliable data systems and pipelines that turn raw
-              submissions into trusted, production-ready assets.
-            </p>
             <div className="hero-stats" aria-label="GitHub summary">
               <div>
                 <strong>{githubStats.repos}</strong>
@@ -390,13 +678,13 @@ function App() {
                 <GitHubIcon />
                 {CONTACT.githubLabel}
               </a>
-              <a className="text-link" href="#projects">
-                See project evidence
+              <a className="text-link" href={CONTACT.github} target="_blank" rel="noreferrer">
+                See GitHub
                 <ArrowIcon />
               </a>
             </div>
           </div>
-          <SystemMap />
+          <SystemMap latestPush={githubStats.latestPush} projectCount={projects.length} />
         </section>
 
         <section className="section section-about" id="about" aria-labelledby="about-title">
@@ -412,40 +700,49 @@ function App() {
                 and figure out how real data systems actually work.
               </p>
               <p>
-                Long term, I want to go back home and help build the kind of infrastructure that lets people
-                and institutions make better decisions with data. That starts with getting good enough to
-                actually do it.
+                My goal is to build data infrastructure that helps people and institutions in Congo and
+                across Africa make better decisions.
               </p>
             </div>
             <dl className="profile-facts">
               <div>
                 <dt>Focus</dt>
-                <dd>Data Engineering Analytics Engineering</dd>
+                <dd className="fact-list">
+                  <span>Data engineering</span>
+                  <span>Analytics engineering</span>
+                  <span>Open data systems</span>
+                </dd>
               </div>
               <div>
                 <dt>Tools</dt>
-                <dd>Python SQL Airflow dbt Spark Kafka PostgreSQL MinIO</dd>
+                <dd className="fact-list">
+                  <span>Python</span>
+                  <span>SQL</span>
+                  <span>Airflow</span>
+                  <span>Prefect</span>
+                  <span>dbt</span>
+                  <span>Spark</span>
+                  <span>Kafka</span>
+                  <span>PostgreSQL</span>
+                  <span>Docker</span>
+                </dd>
               </div>
               <div>
                 <dt>Languages</dt>
-                <dd>English (fluent) French (fluent) Dutch (basic)</dd>
+                <dd className="fact-list">
+                  <span>English</span>
+                  <span>French</span>
+                  <span>Dutch (basic)</span>
+                </dd>
               </div>
               <div>
-                <dt>Currently</dt>
-                <dd>Building data systems that deliver clarity and compounding value.</dd>
+                <dt>Certifications</dt>
+                <dd className="fact-list">
+                  <span>DataCamp Data Engineer Associate</span>
+                  <span>Google Data Analytics</span>
+                </dd>
               </div>
             </dl>
-            <div className="certifications" aria-label="Certifications">
-              <h3>Certifications</h3>
-              <div>
-                <span>DataCamp</span>
-                <strong>Data Engineer Associate</strong>
-              </div>
-              <div>
-                <span>Google</span>
-                <strong>Data Analytics</strong>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -477,14 +774,13 @@ function App() {
           <div className="projects-layout">
             <div className="project-list" aria-label="Project list">
               {visibleProjects.map((project, index) => {
-                const live = repoDetails[project.name] || {};
                 const isSelected = selectedProject.name === project.name;
                 return (
                   <button
                     key={project.name}
                     className={`project-row ${project.featured ? "featured" : ""} ${isSelected ? "selected" : ""}`}
                     type="button"
-                    onClick={() => setSelectedProjectName(project.name)}
+                    onClick={() => selectProject(project.name)}
                     aria-pressed={isSelected}
                   >
                     <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
@@ -493,14 +789,14 @@ function App() {
                       <small>{project.summary}</small>
                     </span>
                     <span className="project-meta">
-                      {live.stars || project.stars ? `${live.stars ?? project.stars} star${(live.stars ?? project.stars) === 1 ? "" : "s"}` : project.category}
+                      {project.category}
                     </span>
                   </button>
                 );
               })}
             </div>
 
-            <article className="project-detail" aria-live="polite">
+            <article className="project-detail" ref={projectDetailRef} aria-live="polite">
               <div className="detail-kicker">{selectedProject.featured ? "Featured project" : selectedProject.category}</div>
               <h3>{selectedProject.name}</h3>
               <p>{selectedProject.longDescription}</p>
@@ -578,11 +874,34 @@ function App() {
 
               {activityTab === "contributions" ? (
                 <div className="contribution-panel">
-                  <img
-                    src={`https://ghchart.rshah.org/84a98c/${GITHUB_USER}`}
-                    alt="GitHub contribution activity for mintyfizz"
-                    loading="lazy"
-                  />
+                  <div className="contribution-summary">
+                    <span>Public GitHub activity</span>
+                    <strong>{contributionSummary.total} events</strong>
+                  </div>
+                  <div className="contribution-grid-wrap">
+                    <div
+                      className="contribution-grid"
+                      role="img"
+                      aria-label={`${contributionSummary.total} public GitHub events across ${contributionSummary.activeDays} active days`}
+                    >
+                      {contributionWeeks.map((week) => (
+                        <div className="contribution-week" key={week.key}>
+                          {week.days.map((day) => (
+                            <span
+                              aria-hidden="true"
+                              className={`contribution-cell level-${day.level} ${day.isFuture ? "future" : ""}`}
+                              key={day.key}
+                              title={`${day.label}: ${day.count} public event${day.count === 1 ? "" : "s"}`}
+                            />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="contribution-footer">
+                    <span>{contributionSummary.activeDays} active days</span>
+                    <span>Last {CONTRIBUTION_WEEKS} weeks</span>
+                  </div>
                   <a className="text-link" href={CONTACT.github} target="_blank" rel="noreferrer">
                     View more activity on GitHub <ArrowIcon />
                   </a>
@@ -617,10 +936,6 @@ function App() {
         </section>
       </main>
 
-      <footer>
-        <span>Nathan Gatse</span>
-        <span>Built with React, semantic HTML, and a focus on clarity.</span>
-      </footer>
     </div>
   );
 }
