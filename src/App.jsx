@@ -263,13 +263,13 @@ function repoToProject(repo, curated) {
     longDescription:
       curated?.longDescription ||
       repo.description ||
-      "Auto-synced public GitHub project. Add a repository description and topics on GitHub to make this card more specific.",
+      "Explore the source code and documentation on GitHub.",
     stack: curated?.stack || deriveProjectStack(repo),
     tags: curated?.tags || deriveProjectTags(repo),
     outcome:
       curated?.outcome ||
-      "Appears automatically from GitHub and updates when the public repository metadata changes.",
-    role: curated?.role || "Repository metadata is pulled from GitHub at page load.",
+      "",
+    role: curated?.role || "",
     stars: repo.stargazers_count || 0,
     pushedAt: repo.pushed_at || "",
     updatedAt: repo.updated_at || "",
@@ -287,6 +287,7 @@ function buildProjectsFromRepos(repos) {
   const missingCuratedProjects = CURATED_PROJECTS.filter((project) => !syncedNames.has(project.name));
 
   return [...syncedProjects, ...missingCuratedProjects].sort((a, b) => {
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
     const timeA = new Date(a.pushedAt || a.updatedAt || 0).getTime();
     const timeB = new Date(b.pushedAt || b.updatedAt || 0).getTime();
     if (timeA !== timeB) return timeB - timeA;
@@ -447,68 +448,26 @@ function ArrowIcon(props) {
   );
 }
 
-function SystemMap({ latestPush, projectCount }) {
-  const lines = Array.from({ length: 12 }, (_, index) => ({
-    y: 52 + index * 17,
-    endY: 92 + Math.abs(index - 5) * 5,
-  }));
-
+function SystemMap({ projectCount }) {
   return (
-    <div className="system-map" role="img" aria-label="GitHub project sync signal">
-      <div className="map-label map-label-top">DATA IN</div>
-      <div className="map-signal map-signal-left">
-        <span>Projects synced</span>
-        <strong>{projectCount}</strong>
-      </div>
-      <svg viewBox="0 0 620 310" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#5b4032" />
-            <stop offset="68%" stopColor="#b77b55" />
-            <stop offset="100%" stopColor="#d8b18d" />
-          </linearGradient>
-        </defs>
-        <rect x="1" y="1" width="618" height="308" fill="none" stroke="#4a342b" strokeWidth="1" />
-        {[130, 260, 390, 520].map((x) => (
-          <path key={x} d={`M${x} 16v278`} stroke="#2a211d" strokeDasharray="2 10" />
-        ))}
-        {lines.map((line, index) => (
-          <path
-            key={line.y}
-            d={`M26 ${line.y} C160 ${line.y} 210 ${line.endY} 286 ${line.endY} S420 ${150 + (index - 6) * 4} 566 150`}
-            stroke="url(#lineGradient)"
-            strokeWidth={index === 6 ? 1.5 : 0.8}
-            fill="none"
-            opacity={0.55 + index * 0.025}
-          />
-        ))}
-        <circle cx="166" cy="92" r="3" fill="#b77b55" />
-        <circle cx="248" cy="177" r="3" fill="#84a98c" />
-        <circle cx="364" cy="126" r="2.5" fill="#d1a45f" />
-        <circle cx="476" cy="166" r="3" fill="#b77b55" />
-        <rect x="216" y="52" width="8" height="8" fill="none" stroke="#d8b18d" />
-        <rect x="532" y="145" width="7" height="7" fill="#84a98c" />
-        {[78, 130, 182].map((y) => (
-          <g key={y}>
-            <rect x="584" y={y} width="4" height="4" fill="#d8b18d" />
-            <circle cx="604" cy={y + 2} r="1.8" fill="#80604e" />
-          </g>
-        ))}
-      </svg>
-      <div className="map-signal map-signal-right">
-        <span>Latest push</span>
-        <strong>{latestPush}</strong>
-      </div>
-      <div className="map-label map-label-bottom">TRUSTED DATA OUT</div>
+    <div className="pipeline-art" aria-label="Illustration of a data pipeline">
+      <div className="art-heading"><span>FROM SOURCE TO INSIGHT</span><span>01 — 03</span></div>
+      <div className="orbit orbit-one" /><div className="orbit orbit-two" />
+      <div className="pipeline-node source-node"><span className="node-icon">{ "{ }" }</span><small>01 / COLLECT</small><strong>Raw data</strong><span>APIs · Events · Open data</span></div>
+      <div className="pipeline-connector connector-one" />
+      <div className="pipeline-node transform-node"><span className="node-icon">↗</span><small>02 / TRANSFORM</small><strong>Better systems.</strong><span>Model · Validate · Orchestrate</span></div>
+      <div className="pipeline-connector connector-two" />
+      <div className="pipeline-node insight-node"><span className="mini-bars"><i /><i /><i /><i /><i /></span><small>03 / UNDERSTAND</small><strong>Clearer decisions.</strong><span>Analytics · Maps · Reports</span></div>
+      <div className="art-footer"><span className="art-dot" />Built through hands-on projects<span>{projectCount} projects ↗</span></div>
     </div>
   );
 }
 
-function SectionTitle({ number, title, action }) {
+function SectionTitle({ number, title, action, id }) {
   return (
     <div className="section-title-row">
       <span className="section-number">{number}</span>
-      <h2>{title}</h2>
+      <h2 id={id}>{title}</h2>
       {action ? <div className="section-action">{action}</div> : null}
     </div>
   );
@@ -643,9 +602,10 @@ function App() {
 
   return (
     <div className="site-shell">
+      <a className="skip-link" href="#main-content">Skip to content</a>
       <header className="nav">
         <a className="brand" href="#top" aria-label="Nathan Gatse home">
-          <span className="brand-mark">NG</span>
+          <span className="brand-mark">ng.</span><span>Nathan Gatse</span>
         </a>
         <nav aria-label="Primary navigation">
           <a href="#about">About</a>
@@ -655,10 +615,14 @@ function App() {
         </nav>
       </header>
 
-      <main id="top">
-        <section className="hero" aria-labelledby="hero-title">
+      <main id="main-content">
+        <section id="top" className="hero" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <h1 id="hero-title">Nathan Gatse</h1>
+            <p className="eyebrow">NATHAN GATSE / DATA &amp; SYSTEMS</p>
+            <h1 id="hero-title">Making data<br />make <em>sense.</em></h1>
+            <p className="hero-intro">I build pipelines, explore patterns, and turn raw data into something useful.</p>
+            <p className="hero-context">Student at Thomas More, Belgium.<br />Building with a perspective from Congo.</p>
+            <div className="hero-actions"><a className="primary-button" href="#projects">Explore my work <ArrowIcon /></a><a className="secondary-button" href="#contact">Let’s connect <ArrowIcon /></a></div>
             <div className="hero-stats" aria-label="GitHub summary">
               <div>
                 <strong>{githubStats.repos}</strong>
@@ -688,11 +652,11 @@ function App() {
         </section>
 
         <section className="section section-about" id="about" aria-labelledby="about-title">
-          <SectionTitle number="01" title="About" />
+          <SectionTitle number="01" title="About" id="about-title" />
           <div className="about-grid">
-            <div className="about-copy" id="about-title">
+            <div className="about-copy">
               <p>
-                I&apos;m <strong>Nathan</strong>, a Data Science student at{" "}
+                I&apos;m <strong>Nathan</strong>, an International Applied Data Intelligence student at{" "}
                 <strong>Thomas More University</strong> in Belgium, originally from the Republic of Congo.
               </p>
               <p>
@@ -749,7 +713,8 @@ function App() {
         <section className="section section-projects" id="projects" aria-labelledby="projects-title">
           <SectionTitle
             number="02"
-            title="Projects"
+            title="Selected work"
+            id="projects-title"
             action={
               <a href={CONTACT.github} target="_blank" rel="noreferrer">
                 View all on GitHub <ArrowIcon />
@@ -773,6 +738,7 @@ function App() {
 
           <div className="projects-layout">
             <div className="project-list" aria-label="Project list">
+              {!visibleProjects.length && <p className="empty-state">No projects in this category yet. Explore another filter.</p>}
               {visibleProjects.map((project, index) => {
                 const isSelected = selectedProject.name === project.name;
                 return (
@@ -785,7 +751,7 @@ function App() {
                   >
                     <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
                     <span>
-                      <strong>{project.name}</strong>
+                      <strong>{titleFromSlug(project.name)}</strong>
                       <small>{project.summary}</small>
                     </span>
                     <span className="project-meta">
@@ -796,19 +762,19 @@ function App() {
               })}
             </div>
 
-            <article className="project-detail" ref={projectDetailRef} aria-live="polite">
+            <article hidden={!visibleProjects.length} className="project-detail" ref={projectDetailRef} aria-live="polite">
               <div className="detail-kicker">{selectedProject.featured ? "Featured project" : selectedProject.category}</div>
-              <h3>{selectedProject.name}</h3>
+              <h3>{titleFromSlug(selectedProject.name)}</h3>
               <p>{selectedProject.longDescription}</p>
               <dl>
-                <div>
+                {selectedProject.role && <div>
                   <dt>Role</dt>
                   <dd>{selectedProject.role}</dd>
-                </div>
-                <div>
+                </div>}
+                {selectedProject.outcome && <div>
                   <dt>Outcome</dt>
                   <dd>{selectedProject.outcome}</dd>
-                </div>
+                </div>}
               </dl>
               <div className="stack-list">
                 {selectedProject.stack.map((item) => (
@@ -823,7 +789,7 @@ function App() {
         </section>
 
         <section className="section section-activity" id="activity" aria-labelledby="activity-title">
-          <SectionTitle number="03" title="Activity" />
+          <SectionTitle number="03" title="Activity" id="activity-title" />
           <div className="activity-shell">
             <div className="tabs" role="tablist" aria-label="Activity views">
               {ACTIVITY_TABS.map((tab) => (
@@ -912,7 +878,7 @@ function App() {
         </section>
 
         <section className="section section-contact" id="contact" aria-labelledby="contact-title">
-          <SectionTitle number="04" title="Contact" />
+          <SectionTitle number="04" title="Let’s build something useful." id="contact-title" />
           <div className="contact-grid">
             <a href={CONTACT.github} target="_blank" rel="noreferrer">
               <GitHubIcon />
@@ -935,6 +901,7 @@ function App() {
           </div>
         </section>
       </main>
+      <footer className="site-footer"><a className="brand" href="#top">ng.</a><span>Built with curiosity. Nathan Gatse © {new Date().getFullYear()}</span><a href="#top">Back to top ↑</a></footer>
 
     </div>
   );
