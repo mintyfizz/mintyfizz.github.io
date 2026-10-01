@@ -3,8 +3,8 @@
   "short_name": "Nathan Gatse",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f8f2",
-  "theme_color": "#f7f8f2",
+  "background_color": "#faf7f2",
+  "theme_color": "#faf7f2",
   "icons": [
     {
       "src": "/favicon.svg",

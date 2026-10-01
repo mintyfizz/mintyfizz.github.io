@@ -1,910 +1,206 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { CONTACT, CV, copy, projects as selectedProjects, skillGroups } from './content';
 
-const GITHUB_USER = "mintyfizz";
-const CONTACT = {
-  github: "https://github.com/mintyfizz",
-  githubLabel: "@mintyfizz",
-  linkedin: "https://linkedin.com/in/thomasgatse",
-  linkedinLabel: "in/thomasgatse",
-  email: "nathangatse@outlook.com",
+const languages = [{id:'en',label:'EN',name:'English'},{id:'fr',label:'FR',name:'Français'},{id:'nl',label:'NL',name:'Nederlands'}];
+const sections = ['work','about','journey','contact'];
+const categories = ['all','engineering','analytics','applications'];
+const local = (value, lang) => typeof value === 'object' ? value[lang] : value;
+const translatedTools = {
+ 'Requirements analysis': {en:'Requirements analysis',fr:'Analyse des besoins',nl:'Behoefteanalyse'},
+ 'Prototyping': {en:'Prototyping',fr:'Prototypage',nl:'Prototyping'},
+ 'GDP compliance': {en:'GDP compliance',fr:'Conformité BPD/GDP',nl:'GDP-compliance'}
+};
+const toolLabel = (tool, lang) => translatedTools[tool]?.[lang] || tool;
+const skillLabels = {
+ en: ['Requirements gathering','Stakeholder communication','Prototyping','Teamwork'],
+ fr: ['Analyse des besoins','Communication métier','Prototypage','Travail en équipe'],
+ nl: ['Behoefteanalyse','Stakeholdercommunicatie','Prototyping','Teamwerk']
 };
 
-const LANG_COLORS = {
-  Python: "#84a98c",
-  "C#": "#b77b55",
-  JavaScript: "#d1a45f",
-  TypeScript: "#7b90a8",
-  HTML: "#a65f45",
-  Shell: "#8a9a5b",
-};
-
-const STATIC_STATS = {
-  repos: "7",
-  stars: "1",
-  latestPush: "May 12, 2026",
-};
-
-const CURATED_PROJECTS = [
-  {
-    name: "cemac-data-observatory",
-    url: "https://github.com/mintyfizz/cemac-data-observatory",
-    category: "Open data pipeline",
-    featured: true,
-    language: "Python",
-    summary:
-      "Containerized digital readiness pipeline for CEMAC country indicators.",
-    longDescription:
-      "Pulls World Bank indicators for six CEMAC countries plus Rwanda and Kenya into Postgres, transforms them with dbt, orchestrates weekly Prefect runs, and serves Metabase dashboard-ready marts.",
-    stack: ["Python", "Prefect", "dbt", "PostgreSQL", "Metabase", "Docker"],
-    tags: ["Pipeline", "Warehouse", "Open data"],
-    outcome:
-      "Creates a repeatable observatory for infrastructure gaps and benchmark trends across regional digital indicators.",
-    role: "Built the extraction flow, warehouse models, orchestration, dashboard layer, and local Docker stack.",
-    stars: 0,
-  },
-  {
-    name: "telco-regulator-pipeline",
-    url: "https://github.com/mintyfizz/telco-regulator-pipeline",
-    category: "Regulatory platform",
-    featured: true,
-    language: "Python",
-    summary:
-      "Open-source reference data platform for telecoms sector regulation.",
-    longDescription:
-      "Synthetic operator submissions, PostgreSQL medallion warehouse, MinIO object storage, dbt marts, and Airflow orchestration calibrated to a Republic of Congo market structure.",
-    stack: ["Python", "Airflow", "dbt", "PostgreSQL", "MinIO", "Docker"],
-    tags: ["Pipeline", "Warehouse", "Regulatory data"],
-    outcome:
-      "Shows generation, ingestion, validation, quality events, and analytics-ready marts for a regulator-side workflow.",
-    role: "Designed the generator, warehouse layers, validation rules, and orchestration path.",
-    stars: 1,
-  },
-  {
-    name: "realtime-data-platform",
-    url: "https://github.com/mintyfizz/realtime-data-platform",
-    category: "Streaming pipeline",
-    language: "Python",
-    summary:
-      "End-to-end real-time pipeline for user-event processing.",
-    longDescription:
-      "Kafka producers feed user events, Spark Structured Streaming transforms them, results land in Cassandra, and Airflow coordinates the pipeline.",
-    stack: ["Kafka", "Spark", "Cassandra", "Airflow", "Docker"],
-    tags: ["Streaming", "Distributed systems"],
-    outcome: "Demonstrates event-driven processing from producers to analytical storage.",
-    role: "Built the containerized data flow and orchestration layer.",
-    stars: 0,
-  },
-  {
-    name: "NatuurSpotter",
-    url: "https://github.com/mintyfizz/NatuurSpotter",
-    category: "Biodiversity analytics",
-    language: "Python",
-    summary:
-      "Published Python package for moth observation data and biodiversity reporting.",
-    longDescription:
-      "Collects and analyses observations from waarnemingen.be, generates biodiversity CSVs, interactive Folium maps, PDF species reports, seasonal charts, and optional LLM interpretation.",
-    stack: ["Python", "Folium", "PDF reports", "LLM"],
-    tags: ["PyPI", "Biodiversity", "Analytics"],
-    outcome: "Turns raw observation data into maps and reports that are easier to inspect.",
-    role: "Built the collection, analysis, mapping, and reporting workflows.",
-    stars: 0,
-  },
-  {
-    name: "Smart-Meal-Fitness-Tracker",
-    url: "https://github.com/mintyfizz/Smart-Meal-Fitness-Tracker",
-    category: "Desktop application",
-    language: "C#",
-    summary:
-      "Windows desktop app for tracking meals, activities, weight, and calorie goals.",
-    longDescription:
-      "WPF / .NET 8 app integrating Supabase for auth and storage, USDA FoodData Central for nutrition data, and Google Gemini for meal recommendations.",
-    stack: ["C#", ".NET 8", "WPF", "Supabase", "USDA API", "Gemini AI"],
-    tags: ["Desktop", "Product data", "AI"],
-    outcome: "Combines structured nutrition data with personal tracking workflows.",
-    role: "Implemented the desktop UI, persistence, integrations, and recommendation flow.",
-    stars: 0,
-  },
-  {
-    name: "spotify-inspiration-lab-staged",
-    url: "https://github.com/mintyfizz/spotify-inspiration-lab-staged",
-    category: "Learning project",
-    language: "C#",
-    summary:
-      "Console-based C# app modelling core Spotify domain concepts.",
-    longDescription:
-      "Models songs, albums, artists, playlists, and favourites with seeded demo data and an intentionally staged commit history.",
-    stack: ["C#", ".NET 9", "OOP"],
-    tags: ["Domain modelling", "Console app"],
-    outcome: "Shows object modelling, clean commits, and small-system design practice.",
-    role: "Built the domain model and staged the learning path through commits.",
-    stars: 0,
-  },
-];
-
-const PORTFOLIO_REPO = `${GITHUB_USER}.github.io`;
-const CURATED_PROJECT_NAMES = new Set(CURATED_PROJECTS.map((project) => project.name));
-
-const PROJECT_FILTERS = [
-  { label: "All" },
-  {
-    label: "Infrastructure",
-    categories: ["Open data pipeline", "Regulatory platform", "Streaming pipeline", "Data pipeline"],
-    tags: ["Pipeline", "Warehouse", "Data Engineering", "ETL", "dbt", "Airflow"],
-  },
-  {
-    label: "Analytics",
-    categories: ["Open data pipeline", "Biodiversity analytics", "Analytics project"],
-    tags: ["Analytics", "Open data", "Biodiversity"],
-  },
-  {
-    label: "Applications",
-    categories: ["Desktop application", "Application"],
-    tags: ["Desktop", "WPF", "React"],
-  },
-  {
-    label: "Learning",
-    categories: ["Learning project"],
-    tags: ["Learning", "OOP", "Console app"],
-  },
-  {
-    label: "Other",
-    other: true,
-  },
-];
-
-const FILTER_LABELS = PROJECT_FILTERS.map((filter) => filter.label);
-
-const ACTIVITY_TABS = [
-  { id: "languages", label: "Languages" },
-  { id: "recent-pushes", label: "Recent pushes" },
-  { id: "contributions", label: "Contributions" },
-];
-
-const CONTRIBUTION_WEEKS = 32;
-
-const FALLBACK_CONTRIBUTIONS = [
-  { date: "2026-05-12T08:56:27Z", count: 1 },
-  { date: "2026-05-09T15:42:23Z", count: 1 },
-  { date: "2026-05-09T15:22:44Z", count: 1 },
-  { date: "2026-05-09T15:14:02Z", count: 1 },
-  { date: "2026-05-02T22:59:57Z", count: 1 },
-  { date: "2026-04-20T02:16:30Z", count: 1 },
-  { date: "2026-03-25T11:11:58Z", count: 1 },
-];
-
-const FALLBACK_RECENT = CURATED_PROJECTS.slice(0, 4).map((project) => ({
-  name: project.name,
-  pushedAt: "",
-  description: project.summary,
-  url: project.url,
-}));
-
-function titleFromSlug(value) {
-  return value
-    .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+function readPreference(key, fallback) {
+  try { return localStorage.getItem(key) || fallback; } catch { return fallback; }
+}
+function initialLanguage() {
+  const candidate = new URLSearchParams(location.search).get('lang') || readPreference('ng-language','en');
+  return copy[candidate] ? candidate : 'en';
+}
+function Icon({name='arrow',className=''}) {
+ const paths = {
+  arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+  external: <><path d="M7 17 17 7M7 7h10v10" /></>,
+  download: <><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" /></>,
+  moon: <path d="M20 14A8 8 0 0 1 10 4a8 8 0 1 0 10 10Z" />,
+  sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" /></>,
+  search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></>,
+  close: <path d="m6 6 12 12M6 18 18 6" />,
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  mail: <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m3 7 9 6 9-6" /></>,
+  copy: <><rect x="8" y="8" width="12" height="13" rx="2" /><path d="M16 8V3H3v13h5" /></>,
+  check: <path d="m5 12 4 4L19 6" />,
+  play: <path d="m9 5 11 7-11 7Z" />,
+  reset: <><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6" /></>,
+  data: <><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0" /></>,
+  chart: <><path d="M4 3v17h17M8 15v-5m5 5V6m5 9v-7" /></>,
+  code: <><path d="m7 6-5 6 5 6m10-12 5 6-5 6M14 3l-4 18" /></>,
+  globe: <><circle cx="12" cy="12" r="9" /><ellipse cx="12" cy="12" rx="4" ry="9" /><path d="M3 12h18" /></>,
+  linkedin: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M7 10v7m0-10v.1M11 17v-7m0 3c0-4 6-4 6 0v4" /></>,
+  github: <><path d="M9 21v-4c-4-1-5-3-5-6 0-2 1-3 2-4V3l4 2h4l4-2v4c1 1 2 2 2 4 0 3-1 5-5 6v4M9 18c-4 1-4-2-6-2" /></>,
+  pin: <><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" /><circle cx="12" cy="10" r="2" /></>
+ };
+ return <svg className={`icon ${className}`} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 
-function topicToLabel(topic) {
-  const specialLabels = {
-    airflow: "Airflow",
-    analytics: "Analytics",
-    dbt: "dbt",
-    docker: "Docker",
-    etl: "ETL",
-    postgresql: "PostgreSQL",
-    python: "Python",
-    react: "React",
-    wpf: "WPF",
-  };
-
-  return specialLabels[topic] || titleFromSlug(topic);
+function useReveal(deps) {
+ useEffect(() => {
+  const nodes = [...document.querySelectorAll('[data-reveal]')];
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+   if(entry.isIntersecting) {entry.target.classList.add('is-visible');observer.unobserve(entry.target);}
+  }),{threshold:.06});
+  nodes.forEach(node=>{node.classList.add('reveal-ready');observer.observe(node);});
+  return ()=>observer.disconnect();
+ }, deps);
 }
 
-function uniqueList(items) {
-  return [...new Set(items.filter(Boolean))];
+function PipelineLab({ t }) {
+ const [step,setStep]=useState(0);
+ const [running,setRunning]=useState(false);
+ const [finished,setFinished]=useState(false);
+ useEffect(()=>{
+  if(!running) return;
+  const timeout=setTimeout(()=>{
+   if(step<2) setStep(step+1); else {setRunning(false);setFinished(true);}
+  },1400);
+  return ()=>clearTimeout(timeout);
+ },[running,step]);
+ function selectStep(index){setRunning(false);setFinished(false);setStep(index);}
+ function run(){setStep(0);setFinished(false);setRunning(true);}
+ function reset(){setRunning(false);setFinished(false);setStep(0);}
+ return <div className={`lab-window step-${step} ${running?'is-running':''}`}>
+  <div className="window-toolbar"><div className="window-dots" aria-hidden="true"><i/><i/><i/></div><span>{t.labTitle}</span><Icon name="code"/></div>
+  <div className="lab-body">
+   <div className="lab-topline"><span>{t.labDemo}</span><span>01 — 03</span></div>
+   <div className="lab-stage">
+    <div className="sculpture" aria-hidden="true"><div className="sculpture-ring ring-a"/><div className="sculpture-ring ring-b"/><div className="sculpture-ring ring-c"/><div className="sculpture-core"/><div className="sculpture-grain"/></div>
+    <div className="floating-token token-left" aria-hidden="true"><Icon name="data"/><span>raw_data</span></div>
+    <div className="floating-token token-right" aria-hidden="true"><Icon name="chart"/><span>insights</span></div>
+   </div>
+   <div className="pipeline-tabs" role="tablist" aria-label={t.labTitle}>
+    {t.steps.map((label,index)=><button key={index} type="button" role="tab" id={`pipeline-tab-${index}`} aria-selected={step===index} aria-controls="pipeline-panel" tabIndex={step===index?0:-1} onClick={()=>selectStep(index)} onKeyDown={e=>{
+     if(['ArrowRight','ArrowLeft','Home','End'].includes(e.key)) {e.preventDefault();const next=e.key==='Home'?0:e.key==='End'?2:(index+(e.key==='ArrowRight'?1:2))%3;selectStep(next);document.getElementById(`pipeline-tab-${next}`)?.focus();}
+    }}><span className="step-number">{index<step||finished?<Icon name="check"/>:String(index+1).padStart(2,'0')}</span>{label}</button>)}
+   </div>
+   <div id="pipeline-panel" className="lab-explanation" role="tabpanel" aria-labelledby={`pipeline-tab-${step}`} aria-live="polite"><h3>{t.stepTitles[step]}</h3><p>{t.stepDescriptions[step]}</p></div>
+   <div className={`mini-dashboard ${step===2?'active':''}`} aria-hidden="true"><div className="dashboard-title">{t.chartLabel}<span>↗</span></div><div className="dashboard-bars">{[35,58,42,72,55,84,65,94,80,100,88,112].map((height,index)=><i key={index} style={{'--bar-height':`${height}px`,'--bar-order':index}}/>)}</div></div>
+   <div className="lab-bottom"><span className="lab-status"><i/>{finished?t.complete:t.labStatus[step]}</span><button type="button" className="lab-run" onClick={finished?reset:run} disabled={running}><Icon name={finished?'reset':'play'}/>{finished?t.reset:t.play}</button></div>
+  </div>
+ </div>;
 }
 
-function deriveProjectCategory(repo) {
-  const name = repo.name.toLowerCase();
-  const topics = repo.topics || [];
-
-  if (name.includes("realtime") || topics.some((topic) => ["kafka", "spark", "streaming"].includes(topic))) {
-    return "Streaming pipeline";
-  }
-
-  if (name.includes("pipeline") || topics.some((topic) => ["data-pipeline", "etl", "airflow", "dbt"].includes(topic))) {
-    return "Data pipeline";
-  }
-
-  if (topics.some((topic) => ["analytics", "biodiversity", "open-data"].includes(topic))) {
-    return "Analytics project";
-  }
-
-  if (repo.language === "C#" || topics.some((topic) => ["wpf", "desktop"].includes(topic))) {
-    return name.includes("lab") || name.includes("staged") ? "Learning project" : "Desktop application";
-  }
-
-  if (repo.language === "JavaScript" || repo.language === "TypeScript") {
-    return "Application";
-  }
-
-  return repo.language ? `${repo.language} project` : "GitHub project";
+function ProjectVisual({type}) {
+ return <div className={`project-art art-${type||'other'}`} aria-hidden="true">
+  {type==='trade'?<><div className="globe-model"><div/><div/><div/><div/></div><div className="art-chip chip-one">21</div><div className="art-chip chip-two">1990—2024</div></>:
+  type==='pipeline'?<div className="visual-pipeline"><span><Icon name="data"/></span><i/><span><Icon name="code"/></span><i/><span><Icon name="chart"/></span></div>:
+  type==='logistics'?<div className="logistics-model"><span>4VISO</span><div><i/><i/><i/></div><b><Icon name="check"/></b></div>:
+  type==='nature'?<div className="nature-model"><i/><i/><i/><i/><i/><i/></div>:
+  ['stream','telco','music'].includes(type)?<div className="wave-model">{Array.from({length:20},(_,i)=><i key={i} style={{'--height':`${24+Math.sin(i*.7)*25+Math.abs(Math.cos(i*.4))*70}px`,'--delay':`${i*.08}s`}}/>)}</div>:
+  <div className="app-model"><Icon name={type==='meal'?'chart':'code'}/><div/><div/><div/></div>}
+ </div>;
 }
 
-function deriveProjectTags(repo) {
-  return uniqueList([
-    repo.language,
-    ...(repo.topics || []).slice(0, 5).map(topicToLabel),
-  ]).slice(0, 6);
+function ProjectCard({project,lang,t,onOpen}) {
+ return <button className="project-card" type="button" onClick={()=>onOpen(project)} data-reveal aria-label={`${t.details}: ${project.title} ${local(project.subtitle,lang)}`}>
+  <ProjectVisual type={project.visual}/>
+  <div className="project-card-body"><span className="project-category">{t.filters[categories.indexOf(project.category)]||'GitHub'} <span>↗</span></span><h3>{project.title}<span>{local(project.subtitle,lang)}</span></h3><p>{local(project.summary,lang)}</p><div className="project-tags">{project.stack.slice(0,3).map(tool=><span key={tool}>{toolLabel(tool,lang)}</span>)}</div><div className="project-card-footer"><span>{local(project.metrics,lang)}</span><span className="round-arrow"><Icon name="arrow"/></span></div></div>
+ </button>;
 }
 
-function deriveProjectStack(repo) {
-  const stack = deriveProjectTags(repo);
-  return stack.length ? stack : ["GitHub"];
-}
-
-function shouldDisplayRepo(repo) {
-  if (repo.name === PORTFOLIO_REPO || repo.archived || repo.disabled) return false;
-  return !repo.fork || CURATED_PROJECT_NAMES.has(repo.name);
-}
-
-function repoToProject(repo, curated) {
-  const category = curated?.category || deriveProjectCategory(repo);
-  const summary = repo.description || curated?.summary || `${titleFromSlug(repo.name)} on GitHub.`;
-
-  return {
-    name: repo.name,
-    url: repo.html_url,
-    category,
-    featured: Boolean(curated?.featured),
-    language: curated?.language || repo.language || "GitHub",
-    summary,
-    longDescription:
-      curated?.longDescription ||
-      repo.description ||
-      "Explore the source code and documentation on GitHub.",
-    stack: curated?.stack || deriveProjectStack(repo),
-    tags: curated?.tags || deriveProjectTags(repo),
-    outcome:
-      curated?.outcome ||
-      "",
-    role: curated?.role || "",
-    stars: repo.stargazers_count || 0,
-    pushedAt: repo.pushed_at || "",
-    updatedAt: repo.updated_at || "",
-    order: curated ? CURATED_PROJECTS.findIndex((project) => project.name === curated.name) : CURATED_PROJECTS.length,
-  };
-}
-
-function buildProjectsFromRepos(repos) {
-  const curatedByName = new Map(CURATED_PROJECTS.map((project) => [project.name, project]));
-  const syncedProjects = repos
-    .filter(shouldDisplayRepo)
-    .map((repo) => repoToProject(repo, curatedByName.get(repo.name)));
-
-  const syncedNames = new Set(syncedProjects.map((project) => project.name));
-  const missingCuratedProjects = CURATED_PROJECTS.filter((project) => !syncedNames.has(project.name));
-
-  return [...syncedProjects, ...missingCuratedProjects].sort((a, b) => {
-    if (a.featured !== b.featured) return a.featured ? -1 : 1;
-    const timeA = new Date(a.pushedAt || a.updatedAt || 0).getTime();
-    const timeB = new Date(b.pushedAt || b.updatedAt || 0).getTime();
-    if (timeA !== timeB) return timeB - timeA;
-    return (a.order ?? CURATED_PROJECTS.length) - (b.order ?? CURATED_PROJECTS.length);
-  });
-}
-
-async function fetchGitHubRepos() {
-  const repos = [];
-  let page = 1;
-
-  while (page <= 10) {
-    const response = await fetch(
-      `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=pushed&page=${page}`,
-    );
-    if (!response.ok) throw new Error("Unable to fetch GitHub repositories");
-
-    const pageRepos = await response.json();
-    if (!Array.isArray(pageRepos) || pageRepos.length === 0) break;
-
-    repos.push(...pageRepos);
-    if (pageRepos.length < 100) break;
-    page += 1;
-  }
-
-  return repos;
-}
-
-function toDayKey(value) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 10);
-}
-
-function formatContributionDate(date) {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
-function buildContributionWeeks(activity) {
-  const now = new Date();
-  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const start = new Date(today);
-  start.setUTCDate(today.getUTCDate() - ((CONTRIBUTION_WEEKS - 1) * 7 + today.getUTCDay()));
-
-  const counts = activity.reduce((map, item) => {
-    const key = toDayKey(item.date);
-    if (!key) return map;
-    const day = new Date(`${key}T00:00:00Z`);
-    if (day < start || day > today) return map;
-    map.set(key, (map.get(key) || 0) + Math.max(1, item.count || 1));
-    return map;
-  }, new Map());
-
-  return Array.from({ length: CONTRIBUTION_WEEKS }, (_, weekIndex) => ({
-    key: `week-${weekIndex}`,
-    days: Array.from({ length: 7 }, (_, dayIndex) => {
-      const date = new Date(start);
-      date.setUTCDate(start.getUTCDate() + weekIndex * 7 + dayIndex);
-      const key = toDayKey(date);
-      const isFuture = date > today;
-      const count = isFuture ? 0 : counts.get(key) || 0;
-      const level = count === 0 ? 0 : Math.min(4, Math.ceil(Math.log2(count + 1)));
-
-      return {
-        key,
-        count,
-        level,
-        isFuture,
-        label: formatContributionDate(date),
-      };
-    }),
-  }));
-}
-
-function summarizeContributionWeeks(weeks) {
-  return weeks.reduce(
-    (summary, week) => {
-      week.days.forEach((day) => {
-        if (day.count > 0) {
-          summary.total += day.count;
-          summary.activeDays += 1;
-        }
-      });
-      return summary;
-    },
-    { total: 0, activeDays: 0 },
-  );
-}
-
-function timeAgo(dateStr) {
-  if (!dateStr) return "Curated";
-  const diff = Math.max(0, Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000));
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
-  if (diff < 31536000) return `${Math.floor(diff / 2592000)}mo ago`;
-  return `${Math.floor(diff / 31536000)}y ago`;
-}
-
-function projectMatchesFilter(project, filterLabel) {
-  const filter = PROJECT_FILTERS.find(({ label }) => label === filterLabel);
-  if (!filter || filter.label === "All") return true;
-  if (filter.other) {
-    return !PROJECT_FILTERS.some((candidate) => {
-      return candidate.label !== "All" && !candidate.other && projectMatchesFilter(project, candidate.label);
-    });
-  }
-
-  const projectTags = project.tags || [];
-  return (
-    filter.categories?.includes(project.category) ||
-    filter.tags?.some((tag) => projectTags.includes(tag))
-  );
-}
-
-function GitHubIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
-      <path
-        fill="currentColor"
-        d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
-      />
-    </svg>
-  );
-}
-
-function LinkedInIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
-      <path
-        fill="currentColor"
-        d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-      />
-    </svg>
-  );
-}
-
-function MailIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" {...props}>
-      <rect x="2.5" y="4.5" width="19" height="15" rx="2" stroke="currentColor" strokeWidth="1.6" />
-      <path d="m3 7 8.35 5.35a1.2 1.2 0 0 0 1.3 0L21 7" stroke="currentColor" strokeWidth="1.6" />
-    </svg>
-  );
-}
-
-function ArrowIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" {...props}>
-      <path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function SystemMap({ projectCount }) {
-  return (
-    <div className="pipeline-art" aria-label="Illustration of a data pipeline">
-      <div className="art-heading"><span>FROM SOURCE TO INSIGHT</span><span>01 — 03</span></div>
-      <div className="orbit orbit-one" /><div className="orbit orbit-two" />
-      <div className="pipeline-node source-node"><span className="node-icon">{ "{ }" }</span><small>01 / COLLECT</small><strong>Raw data</strong><span>APIs · Events · Open data</span></div>
-      <div className="pipeline-connector connector-one" />
-      <div className="pipeline-node transform-node"><span className="node-icon">↗</span><small>02 / TRANSFORM</small><strong>Better systems.</strong><span>Model · Validate · Orchestrate</span></div>
-      <div className="pipeline-connector connector-two" />
-      <div className="pipeline-node insight-node"><span className="mini-bars"><i /><i /><i /><i /><i /></span><small>03 / UNDERSTAND</small><strong>Clearer decisions.</strong><span>Analytics · Maps · Reports</span></div>
-      <div className="art-footer"><span className="art-dot" />Built through hands-on projects<span>{projectCount} projects ↗</span></div>
-    </div>
-  );
-}
-
-function SectionTitle({ number, title, action, id }) {
-  return (
-    <div className="section-title-row">
-      <span className="section-number">{number}</span>
-      <h2 id={id}>{title}</h2>
-      {action ? <div className="section-action">{action}</div> : null}
-    </div>
-  );
+function ProjectDialog({project,lang,t,onClose}) {
+ const ref=useRef(null);
+ useEffect(()=>{const dialog=ref.current;if(!dialog)return;dialog.showModal();const overflow=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{dialog.close();document.body.style.overflow=overflow;};},[]);
+ return <dialog ref={ref} className="project-dialog" onCancel={e=>{e.preventDefault();onClose();}} onClick={e=>{if(e.target===ref.current)onClose();}} aria-labelledby="dialog-title">
+  <div className="dialog-content"><button type="button" className="dialog-close icon-button" onClick={onClose} aria-label={t.close}><Icon name="close"/></button><ProjectVisual type={project.visual}/><div className="dialog-copy"><p className="eyebrow">{t.caseStudy} / {project.team?t.team:local(project.metrics,lang)}</p><h2 id="dialog-title">{project.title}<span>{local(project.subtitle,lang)}</span></h2><p className="dialog-lead">{local(project.summary,lang)}</p>
+  {['context','approach','outcome'].map(key=>project[key]?<div className="case-section" key={key}><h3>{t[key]}</h3><p>{local(project[key],lang)}</p></div>:null)}
+  <h3 className="tools-heading">{t.tools}</h3><div className="project-tags">{project.stack.map(tool=><span key={tool}>{toolLabel(tool,lang)}</span>)}</div><a className="button button-dark" href={project.url||`mailto:${CONTACT.email}?subject=${encodeURIComponent(project.title)}`} target={project.url?'_blank':undefined} rel={project.url?'noreferrer':undefined}>{project.url?t.source:t.discuss}<Icon name="external"/></a></div></div>
+ </dialog>;
 }
 
 function App() {
-  const [githubStats, setGithubStats] = useState(STATIC_STATS);
-  const [projects, setProjects] = useState(CURATED_PROJECTS);
-  const [languageStats, setLanguageStats] = useState([
-    { lang: "Python", pct: 60 },
-    { lang: "C#", pct: 40 },
-  ]);
-  const [recentRepos, setRecentRepos] = useState(FALLBACK_RECENT);
-  const [contributionActivity, setContributionActivity] = useState(FALLBACK_CONTRIBUTIONS);
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [selectedProjectName, setSelectedProjectName] = useState(CURATED_PROJECTS[0].name);
-  const [activityTab, setActivityTab] = useState(ACTIVITY_TABS[0].id);
-  const projectDetailRef = useRef(null);
-  const userSelectedProjectRef = useRef(false);
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function enrichFromGitHub() {
-      try {
-        const repos = await fetchGitHubRepos();
-        if (ignore || !Array.isArray(repos)) return;
-
-        const displayRepos = repos.filter(shouldDisplayRepo);
-        const totalStars = displayRepos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0);
-        const latest = [...displayRepos]
-          .filter((repo) => repo.pushed_at)
-          .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))[0];
-
-        setGithubStats({
-          repos: displayRepos.length ? String(displayRepos.length) : STATIC_STATS.repos,
-          stars: String(totalStars),
-          latestPush: latest ? timeAgo(latest.pushed_at) : STATIC_STATS.latestPush,
-        });
-
-        const nextProjects = buildProjectsFromRepos(repos);
-        setProjects(nextProjects);
-        setSelectedProjectName((currentProjectName) => {
-          if (userSelectedProjectRef.current && nextProjects.some((project) => project.name === currentProjectName)) {
-            return currentProjectName;
-          }
-
-          return nextProjects[0]?.name || currentProjectName;
-        });
-
-        const languageCounts = displayRepos.reduce((counts, repo) => {
-          if (repo.language) counts[repo.language] = (counts[repo.language] || 0) + 1;
-          return counts;
-        }, {});
-        const totalLanguageRepos = Object.values(languageCounts).reduce((sum, count) => sum + count, 0);
-        if (totalLanguageRepos > 0) {
-          setLanguageStats(
-            Object.entries(languageCounts)
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 5)
-              .map(([lang, count]) => ({
-                lang,
-                pct: Math.max(4, Math.round((count / totalLanguageRepos) * 100)),
-              })),
-          );
-        }
-
-        setRecentRepos(
-          [...displayRepos]
-            .filter((repo) => repo.pushed_at)
-            .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))
-            .slice(0, 5)
-            .map((repo) => ({
-              name: repo.name,
-              pushedAt: repo.pushed_at,
-              description: repo.description || "Repository activity",
-              url: repo.html_url,
-            })),
-        );
-
-        const repoActivity = displayRepos
-          .filter((repo) => repo.pushed_at)
-          .map((repo) => ({ date: repo.pushed_at, count: 1 }));
-        setContributionActivity(repoActivity);
-      } catch {
-        // Static curated content is the product experience; GitHub data only enriches it.
-      }
-    }
-
-    enrichFromGitHub();
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  const visibleProjects = useMemo(() => {
-    return projects.filter((project) => projectMatchesFilter(project, activeFilter));
-  }, [activeFilter, projects]);
-
-  useEffect(() => {
-    if (!visibleProjects.length) return;
-    if (!visibleProjects.some((project) => project.name === selectedProjectName)) {
-      setSelectedProjectName(visibleProjects[0].name);
-    }
-  }, [selectedProjectName, visibleProjects]);
-
-  const selectedProject =
-    projects.find((project) => project.name === selectedProjectName) ||
-    visibleProjects[0] ||
-    projects[0] ||
-    CURATED_PROJECTS[0];
-  const contributionWeeks = useMemo(() => buildContributionWeeks(contributionActivity), [contributionActivity]);
-  const contributionSummary = useMemo(() => summarizeContributionWeeks(contributionWeeks), [contributionWeeks]);
-
-  function selectFilter(filter) {
-    userSelectedProjectRef.current = true;
-    setActiveFilter(filter);
-    const nextProject = projects.find((project) => projectMatchesFilter(project, filter)) || projects[0] || CURATED_PROJECTS[0];
-    setSelectedProjectName(nextProject.name);
-  }
-
-  function selectProject(projectName) {
-    userSelectedProjectRef.current = true;
-    setSelectedProjectName(projectName);
-
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 720px)").matches) {
-      window.requestAnimationFrame(() => {
-        projectDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-  }
-
-  return (
-    <div className="site-shell">
-      <a className="skip-link" href="#main-content">Skip to content</a>
-      <header className="nav">
-        <a className="brand" href="#top" aria-label="Nathan Gatse home">
-          <span className="brand-mark">ng.</span><span>Nathan Gatse</span>
-        </a>
-        <nav aria-label="Primary navigation">
-          <a href="#about">About</a>
-          <a href="#projects">Projects</a>
-          <a href="#activity">Activity</a>
-          <a href="#contact">Contact</a>
-        </nav>
-      </header>
-
-      <main id="main-content">
-        <section id="top" className="hero" aria-labelledby="hero-title">
-          <div className="hero-copy">
-            <p className="eyebrow">NATHAN GATSE / DATA &amp; SYSTEMS</p>
-            <h1 id="hero-title">Making data<br />make <em>sense.</em></h1>
-            <p className="hero-intro">I build pipelines, explore patterns, and turn raw data into something useful.</p>
-            <p className="hero-context">Student at Thomas More, Belgium.<br />Building with a perspective from Congo.</p>
-            <div className="hero-actions"><a className="primary-button" href="#projects">Explore my work <ArrowIcon /></a><a className="secondary-button" href="#contact">Let’s connect <ArrowIcon /></a></div>
-            <div className="hero-stats" aria-label="GitHub summary">
-              <div>
-                <strong>{githubStats.repos}</strong>
-                <span>Repositories</span>
-              </div>
-              <div>
-                <strong>{githubStats.stars}</strong>
-                <span>Stars</span>
-              </div>
-              <div>
-                <strong>{githubStats.latestPush}</strong>
-                <span>Last push</span>
-              </div>
-            </div>
-            <div className="hero-links">
-              <a className="text-link strong" href={CONTACT.github} target="_blank" rel="noreferrer">
-                <GitHubIcon />
-                {CONTACT.githubLabel}
-              </a>
-              <a className="text-link" href={CONTACT.github} target="_blank" rel="noreferrer">
-                See GitHub
-                <ArrowIcon />
-              </a>
-            </div>
-          </div>
-          <SystemMap latestPush={githubStats.latestPush} projectCount={projects.length} />
-        </section>
-
-        <section className="section section-about" id="about" aria-labelledby="about-title">
-          <SectionTitle number="01" title="About" id="about-title" />
-          <div className="about-grid">
-            <div className="about-copy">
-              <p>
-                I&apos;m <strong>Nathan</strong>, an International Applied Data Intelligence student at{" "}
-                <strong>Thomas More University</strong> in Belgium, originally from the Republic of Congo.
-              </p>
-              <p>
-                I learn by building things. The projects on this page are how I push past what class covers
-                and figure out how real data systems actually work.
-              </p>
-              <p>
-                My goal is to build data infrastructure that helps people and institutions in Congo and
-                across Africa make better decisions.
-              </p>
-            </div>
-            <dl className="profile-facts">
-              <div>
-                <dt>Focus</dt>
-                <dd className="fact-list">
-                  <span>Data engineering</span>
-                  <span>Analytics engineering</span>
-                  <span>Open data systems</span>
-                </dd>
-              </div>
-              <div>
-                <dt>Tools</dt>
-                <dd className="fact-list">
-                  <span>Python</span>
-                  <span>SQL</span>
-                  <span>Airflow</span>
-                  <span>Prefect</span>
-                  <span>dbt</span>
-                  <span>Spark</span>
-                  <span>Kafka</span>
-                  <span>PostgreSQL</span>
-                  <span>Docker</span>
-                </dd>
-              </div>
-              <div>
-                <dt>Languages</dt>
-                <dd className="fact-list">
-                  <span>English</span>
-                  <span>French</span>
-                  <span>Dutch (basic)</span>
-                </dd>
-              </div>
-              <div>
-                <dt>Certifications</dt>
-                <dd className="fact-list">
-                  <span>DataCamp Data Engineer Associate</span>
-                  <span>Google Data Analytics</span>
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </section>
-
-        <section className="section section-projects" id="projects" aria-labelledby="projects-title">
-          <SectionTitle
-            number="02"
-            title="Selected work"
-            id="projects-title"
-            action={
-              <a href={CONTACT.github} target="_blank" rel="noreferrer">
-                View all on GitHub <ArrowIcon />
-              </a>
-            }
-          />
-
-          <div className="filters" aria-label="Project filters">
-            {FILTER_LABELS.map((filter) => (
-              <button
-                key={filter}
-                className={filter === activeFilter ? "active" : ""}
-                type="button"
-                onClick={() => selectFilter(filter)}
-                aria-pressed={filter === activeFilter}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
-
-          <div className="projects-layout">
-            <div className="project-list" aria-label="Project list">
-              {!visibleProjects.length && <p className="empty-state">No projects in this category yet. Explore another filter.</p>}
-              {visibleProjects.map((project, index) => {
-                const isSelected = selectedProject.name === project.name;
-                return (
-                  <button
-                    key={project.name}
-                    className={`project-row ${project.featured ? "featured" : ""} ${isSelected ? "selected" : ""}`}
-                    type="button"
-                    onClick={() => selectProject(project.name)}
-                    aria-pressed={isSelected}
-                  >
-                    <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
-                    <span>
-                      <strong>{titleFromSlug(project.name)}</strong>
-                      <small>{project.summary}</small>
-                    </span>
-                    <span className="project-meta">
-                      {project.category}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <article hidden={!visibleProjects.length} className="project-detail" ref={projectDetailRef} aria-live="polite">
-              <div className="detail-kicker">{selectedProject.featured ? "Featured project" : selectedProject.category}</div>
-              <h3>{titleFromSlug(selectedProject.name)}</h3>
-              <p>{selectedProject.longDescription}</p>
-              <dl>
-                {selectedProject.role && <div>
-                  <dt>Role</dt>
-                  <dd>{selectedProject.role}</dd>
-                </div>}
-                {selectedProject.outcome && <div>
-                  <dt>Outcome</dt>
-                  <dd>{selectedProject.outcome}</dd>
-                </div>}
-              </dl>
-              <div className="stack-list">
-                {selectedProject.stack.map((item) => (
-                  <span key={item}>{item}</span>
-                ))}
-              </div>
-              <a className="text-link strong" href={selectedProject.url} target="_blank" rel="noreferrer">
-                Open repository <ArrowIcon />
-              </a>
-            </article>
-          </div>
-        </section>
-
-        <section className="section section-activity" id="activity" aria-labelledby="activity-title">
-          <SectionTitle number="03" title="Activity" id="activity-title" />
-          <div className="activity-shell">
-            <div className="tabs" role="tablist" aria-label="Activity views">
-              {ACTIVITY_TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  id={`tab-${tab.id}`}
-                  role="tab"
-                  aria-selected={activityTab === tab.id}
-                  aria-controls="activity-panel"
-                  className={activityTab === tab.id ? "active" : ""}
-                  type="button"
-                  onClick={() => setActivityTab(tab.id)}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="activity-panel" id="activity-panel" role="tabpanel" aria-labelledby={`tab-${activityTab}`}>
-              {activityTab === "languages" ? (
-                <div className="language-bars">
-                  {languageStats.map(({ lang, pct }) => (
-                    <div className="language-row" key={lang}>
-                      <span>
-                        <i style={{ background: LANG_COLORS[lang] || "#a68a7a" }} />
-                        {lang}
-                      </span>
-                      <strong>{pct}%</strong>
-                      <div>
-                        <b style={{ width: `${pct}%`, background: LANG_COLORS[lang] || "#a68a7a" }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {activityTab === "recent-pushes" ? (
-                <div className="recent-list">
-                  {recentRepos.map((repo) => (
-                    <a key={`${repo.name}-${repo.pushedAt}`} href={repo.url} target="_blank" rel="noreferrer">
-                      <span>{repo.name}</span>
-                      <small>{repo.description}</small>
-                      <em>{timeAgo(repo.pushedAt)}</em>
-                    </a>
-                  ))}
-                </div>
-              ) : null}
-
-              {activityTab === "contributions" ? (
-                <div className="contribution-panel">
-                  <div className="contribution-summary">
-                    <span>Public GitHub activity</span>
-                    <strong>{contributionSummary.total} events</strong>
-                  </div>
-                  <div className="contribution-grid-wrap">
-                    <div
-                      className="contribution-grid"
-                      role="img"
-                      aria-label={`${contributionSummary.total} public GitHub events across ${contributionSummary.activeDays} active days`}
-                    >
-                      {contributionWeeks.map((week) => (
-                        <div className="contribution-week" key={week.key}>
-                          {week.days.map((day) => (
-                            <span
-                              aria-hidden="true"
-                              className={`contribution-cell level-${day.level} ${day.isFuture ? "future" : ""}`}
-                              key={day.key}
-                              title={`${day.label}: ${day.count} public event${day.count === 1 ? "" : "s"}`}
-                            />
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="contribution-footer">
-                    <span>{contributionSummary.activeDays} active days</span>
-                    <span>Last {CONTRIBUTION_WEEKS} weeks</span>
-                  </div>
-                  <a className="text-link" href={CONTACT.github} target="_blank" rel="noreferrer">
-                    View more activity on GitHub <ArrowIcon />
-                  </a>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </section>
-
-        <section className="section section-contact" id="contact" aria-labelledby="contact-title">
-          <SectionTitle number="04" title="Let’s build something useful." id="contact-title" />
-          <div className="contact-grid">
-            <a href={CONTACT.github} target="_blank" rel="noreferrer">
-              <GitHubIcon />
-              <span>GitHub</span>
-              <strong>{CONTACT.githubLabel}</strong>
-              <small>github.com/mintyfizz</small>
-            </a>
-            <a href={CONTACT.linkedin} target="_blank" rel="noreferrer">
-              <LinkedInIcon />
-              <span>LinkedIn</span>
-              <strong>{CONTACT.linkedinLabel}</strong>
-              <small>linkedin.com/in/thomasgatse</small>
-            </a>
-            <a href={`mailto:${CONTACT.email}`}>
-              <MailIcon />
-              <span>Email</span>
-              <strong>{CONTACT.email}</strong>
-              <small>Direct project and collaboration notes</small>
-            </a>
-          </div>
-        </section>
-      </main>
-      <footer className="site-footer"><a className="brand" href="#top">ng.</a><span>Built with curiosity. Nathan Gatse © {new Date().getFullYear()}</span><a href="#top">Back to top ↑</a></footer>
-
-    </div>
-  );
+ const [lang,setLang]=useState(initialLanguage);
+ const [theme,setTheme]=useState(()=>readPreference('ng-theme','latte')==='espresso'?'espresso':'latte');
+ const [menuOpen,setMenuOpen]=useState(false);
+ const [activeSection,setActiveSection]=useState('');
+ const [filter,setFilter]=useState('all');
+ const [query,setQuery]=useState('');
+ const [skillTab,setSkillTab]=useState(0);
+ const [project,setProject]=useState(null);
+ const [repos,setRepos]=useState([]);
+ const [toast,setToast]=useState('');
+ const t=copy[lang];
+ const allProjects=useMemo(()=>{
+  const existing=new Set(selectedProjects.map(p=>p.id));
+  return [...selectedProjects,...repos.filter(r=>!existing.has(r.name)&&r.name!=='mintyfizz.github.io'&&!r.fork&&!r.archived&&!r.disabled).map(r=>({id:r.name,title:r.name.replace(/[-_]/g,' '),subtitle:{en:'GitHub project',fr:'Projet GitHub',nl:'GitHub-project'},summary:{en:copy.en.repoFallback,fr:copy.fr.repoFallback,nl:copy.nl.repoFallback},stack:[r.language||'GitHub',...(r.topics||[]).slice(0,2)],category:r.language==='Python'||r.language==='Jupyter Notebook'?'analytics':'applications',url:r.html_url,metrics:{en:'Public repository',fr:'Dépôt public',nl:'Openbare repository'},visual:'other'}))];
+ },[repos]);
+ const visibleProjects=useMemo(()=>allProjects.filter(p=>(filter==='all'||p.category===filter)&&[p.title,local(p.subtitle,lang),local(p.summary,lang),...p.stack].join(' ').toLowerCase().includes(query.trim().toLowerCase())),[allProjects,filter,query,lang]);
+ useReveal([lang,filter,query,repos]);
+ useEffect(()=>{
+  document.documentElement.lang=lang;
+  document.title=`Nathan Gatse | ${t.disciplines[0]} & ${t.disciplines[1]}`;
+  document.querySelector('meta[name="description"]')?.setAttribute('content',t.description);
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content',document.title);
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content',t.description);
+  document.querySelector('meta[name="twitter:title"]')?.setAttribute('content',document.title);
+  document.querySelector('meta[name="twitter:description"]')?.setAttribute('content',t.description);
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href',`https://mintyfizz.github.io/${lang==='en'?'':`?lang=${lang}`}`);
+  const url=new URL(location.href);if(lang==='en')url.searchParams.delete('lang');else url.searchParams.set('lang',lang);history.replaceState(null,'',url);
+  try{localStorage.setItem('ng-language',lang);}catch{}
+ },[lang,t]);
+ useEffect(()=>{document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',theme==='espresso'?'#1e1714':'#faf7f2');try{localStorage.setItem('ng-theme',theme);}catch{}},[theme]);
+ useEffect(()=>{const controller=new AbortController();fetch('https://api.github.com/users/mintyfizz/repos?per_page=100&sort=pushed',{signal:controller.signal}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{if(Array.isArray(data))setRepos(data);}).catch(()=>{});return()=>controller.abort();},[]);
+ useEffect(()=>{
+  const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting)setActiveSection(entry.target.id);});},{rootMargin:'-20% 0px -55% 0px'});
+  sections.forEach(id=>{const node=document.getElementById(id);if(node)observer.observe(node);});return()=>observer.disconnect();
+ },[]);
+ useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),3500);return()=>clearTimeout(timer);},[toast]);
+ useEffect(()=>{if(!menuOpen)return;function escape(e){if(e.key==='Escape'){setMenuOpen(false);document.querySelector('.menu-toggle')?.focus();}}document.addEventListener('keydown',escape);return()=>document.removeEventListener('keydown',escape);},[menuOpen]);
+ async function copyEmail(){try{await navigator.clipboard.writeText(CONTACT.email);setToast(t.copied);}catch{setToast(t.copyFailed);}}
+ function switchLanguage(id){setLang(id);setMenuOpen(false);setToast('');}
+ function resetFilters(){setQuery('');setFilter('all');}
+ return <>
+  <a className="skip-link" href="#main">{t.skip}</a>
+  <header className="site-header"><div className="nav-shell"><a className="brand" href="#top" aria-label="Nathan Gatse"><span className="brand-monogram">ng<span>.</span></span><span className="brand-name">Nathan Gatse</span></a>
+   <nav className={`main-nav ${menuOpen?'open':''}`} id="primary-navigation" aria-label={t.menu}>{sections.map((section,i)=><a key={section} className={activeSection===section?'active':''} href={`#${section}`} onClick={()=>setMenuOpen(false)} aria-current={activeSection===section?'location':undefined}>{t.nav[i]}</a>)}</nav>
+   <div className="nav-controls"><div className="language-picker" role="group" aria-label={t.language}>{languages.map(l=><button type="button" key={l.id} onClick={()=>switchLanguage(l.id)} aria-label={l.name} aria-pressed={lang===l.id} lang={l.id}>{l.label}</button>)}</div><button className="icon-button theme-toggle" type="button" onClick={()=>setTheme(theme==='latte'?'espresso':'latte')} aria-label={`${t.theme}: ${theme==='latte'?t.espresso:t.latte}`} title={`${t.theme}: ${theme==='latte'?t.espresso:t.latte}`}><Icon name={theme==='latte'?'moon':'sun'}/></button><button className="icon-button menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="primary-navigation" aria-label={menuOpen?t.closeMenu:t.menu} onClick={()=>setMenuOpen(!menuOpen)}><Icon name={menuOpen?'close':'menu'}/></button></div>
+  </div></header>
+  <main id="main">
+   <section className="hero section-width" id="top" aria-labelledby="hero-title">
+    <div className="hero-copy"><a className="availability-pill" href="#contact"><span/>{t.availability}<Icon name="external"/></a><p className="eyebrow">{t.heroTop}</p><h1 id="hero-title">{t.heroTitle[0]}<span>{t.heroTitle[1]}</span></h1><p className="hero-description">{t.heroDescription}</p><div className="hero-buttons"><a className="button button-dark" href="#work">{t.workCta}<Icon name="arrow"/></a><a className="button button-glass" href={lang==='fr'?CV.fr:CV.en} download>{t.cvCta}<Icon name="download"/></a></div><div className="hero-location"><Icon name="pin"/>{t.location}<span>·</span><a href={CONTACT.linkedin} target="_blank" rel="noreferrer">LinkedIn<Icon name="external"/></a></div></div>
+    <div className="hero-visual"><div className="hero-halo"/><PipelineLab t={t}/></div>
+    <a className="scroll-note" href="#work"><span>{t.scroll}</span><Icon name="arrow"/></a>
+   </section>
+   <div className="discipline-strip"><div className="section-width">{t.disciplines.map((text,i)=><span key={text}>{text}{i!==3&&<i/>}</span>)}</div></div>
+   <section className="work-section section-width section-pad" id="work" aria-labelledby="work-title">
+    <div className="section-heading" data-reveal><p className="eyebrow">{t.workEyebrow}</p><h2 id="work-title">{t.workTitle}</h2><p>{t.workDescription}</p></div>
+    <div className="project-controls"><div className="filter-group" role="group" aria-label={t.workTitle}>{categories.map((key,i)=><button key={key} type="button" className={filter===key?'active':''} aria-pressed={filter===key} onClick={()=>setFilter(key)}>{t.filters[i]}</button>)}</div><div className="search-input"><Icon name="search"/><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t.search} aria-label={t.searchLabel}/>{query&&<button className="icon-button" type="button" onClick={()=>setQuery('')} aria-label={t.clear}><Icon name="close"/></button>}</div></div>
+    <div className="projects-grid">{visibleProjects.map(p=><ProjectCard key={p.id} project={p} lang={lang} t={t} onOpen={setProject}/>)}{!visibleProjects.length&&<div className="empty-state"><Icon name="search"/><p>{t.noResults}</p><button type="button" className="button button-glass" onClick={resetFilters}>{t.resetFilters}</button></div>}</div>
+    <div className="work-footer"><p aria-live="polite">{visibleProjects.length} {t.projectCount} <span>· {repos.length?t.fresh:t.curated}</span></p><a className="text-link" href={CONTACT.github} target="_blank" rel="noreferrer">{t.githubMore}<Icon name="external"/></a></div>
+   </section>
+   <section className="about-section" id="about" aria-labelledby="about-title"><div className="section-width section-pad"><div className="about-grid"><div className="about-heading" data-reveal><p className="eyebrow">{t.aboutEyebrow}</p><h2 id="about-title">{t.aboutTitle}</h2><div className="profile-art" aria-hidden="true"><span>ng.</span><div className="profile-orbit"/><p>Congo <span>↗</span> {lang==='fr'?'Belgique':lang==='nl'?'België':'Belgium'}</p></div></div><div className="about-copy" data-reveal>{t.aboutParagraphs.map((p,i)=><p key={i}>{p}</p>)}<a className="text-link" href={CONTACT.linkedin} target="_blank" rel="noreferrer">{t.linkedinCta}<Icon name="external"/></a><div className="language-card"><h3><Icon name="globe"/>{t.languageTitle}</h3><div>{t.languages.map((language,i)=><p key={language}><strong>{language}</strong><span>{t.fluency[i]}</span></p>)}</div></div></div></div>
+    <div className="stats-grid" data-reveal>{t.stats.map(stat=><div key={stat.value}><strong>{stat.value}<span>↗</span></strong><p>{stat.label}</p></div>)}</div>
+    <div className="skills-card" data-reveal><div><p className="eyebrow">Python · SQL · BI</p><h3>{t.skillsTitle}</h3><p>{t.skillsDescription}</p></div><div className="skills-content"><div className="skill-tabs" role="tablist" aria-label={t.skillsTitle}>{t.skillTabs.map((name,i)=><button key={name} type="button" id={`skill-tab-${i}`} role="tab" aria-selected={skillTab===i} aria-controls="skill-panel" tabIndex={skillTab===i?0:-1} onClick={()=>setSkillTab(i)} onKeyDown={e=>{if(['ArrowRight','ArrowLeft','Home','End'].includes(e.key)){e.preventDefault();const next=e.key==='Home'?0:e.key==='End'?2:(i+(e.key==='ArrowRight'?1:2))%3;setSkillTab(next);document.getElementById(`skill-tab-${next}`)?.focus();}}}>{name}</button>)}</div><div role="tabpanel" id="skill-panel" aria-labelledby={`skill-tab-${skillTab}`}><p>{t.skillDescriptions[skillTab]}</p><div className="skill-tags">{[...skillGroups[skillTab],...(skillTab===2?skillLabels[lang]:[])].map(tool=><span key={tool}>{tool}</span>)}</div></div></div></div>
+   </div></section>
+   <section className="journey-section section-width section-pad" id="journey" aria-labelledby="journey-title"><div className="section-heading" data-reveal><p className="eyebrow">{t.journeyEyebrow}</p><h2 id="journey-title">{t.journeyTitle}</h2></div><div className="journey-grid"><div className="timeline" data-reveal><h3>{t.education}</h3>{[
+    {date:t.present,title:t.schoolTitle,place:t.schoolSubtitle,body:t.schoolBody,open:true},
+    {date:'2023 — 2024',title:t.kuTitle,place:'KU Leuven',body:t.kuBody},
+    {date:'2021 — 2023',title:t.ibTitle,place:'St. John’s International School',body:t.ibBody}
+   ].map(item=><details key={item.title} className="timeline-item" open={item.open||undefined}><summary><span className="timeline-date">{item.date}</span><span><strong>{item.title}</strong><small>{item.place}</small></span><span className="expand-icon">+</span></summary><p>{item.body}</p></details>)}</div><div className="experience-column" data-reveal><h3>{t.experience}</h3><article className="experience-card"><span className="timeline-date">2020</span><h4>{t.auditTitle}</h4><p className="experience-place">{t.auditPlace}</p><p>{t.auditBody}</p></article><div className="certifications"><h3>{t.certifications}</h3><div><span className="cert-icon"><Icon name="check"/></span><p><strong>Data Engineer Associate</strong><span>DataCamp · 2026</span></p></div><div><span className="cert-icon"><Icon name="check"/></span><p><strong>Google Data Analytics</strong><span>Google · 2025</span></p></div></div></div></div>
+    <div className="cv-section" data-reveal><div><span className="pdf-icon"><Icon name="download"/></span><p className="eyebrow">{t.originalCV}</p><h3>{t.cvTitle}</h3><p>{t.cvDescription}</p></div><div className="cv-downloads"><a href={CV.en} download className="cv-download"><span><strong>{t.englishCV}</strong><small>English · PDF</small></span><Icon name="download"/></a><a href={CV.fr} download className="cv-download"><span><strong>{t.frenchCV}</strong><small>Français · PDF</small></span><Icon name="download"/></a></div></div>
+   </section>
+   <section className="contact-section" id="contact" aria-labelledby="contact-title"><div className="section-width contact-inner" data-reveal><p className="eyebrow">{t.contactEyebrow}</p><h2 id="contact-title">{t.contactTitle[0]}<span>{t.contactTitle[1]}</span></h2><p className="contact-description">{t.contactDescription}</p><div className="contact-buttons"><a className="button button-cream" href={`mailto:${CONTACT.email}`}>{t.emailCta}<Icon name="mail"/></a><button className="button button-outline" type="button" aria-label={`${t.copyEmail}: ${CONTACT.email}`} onClick={copyEmail}><Icon name="copy"/>{CONTACT.email}</button></div><div className="contact-bottom"><div><span className="availability-dot"/><p><strong>{t.internship}</strong><span>{t.internshipDetail}</span></p></div><div className="social-links"><a href={CONTACT.linkedin} target="_blank" rel="noreferrer"><Icon name="linkedin"/>LinkedIn<Icon name="external"/></a><a href={CONTACT.github} target="_blank" rel="noreferrer"><Icon name="github"/>GitHub<Icon name="external"/></a></div></div></div></section>
+  </main>
+  <footer className="site-footer section-width"><a className="brand-monogram" href="#top">ng.</a><span>© {new Date().getFullYear()} Nathan Gatse <span className="footer-note">· {t.footer}</span></span><a href="#top">{t.top}<Icon name="arrow"/></a></footer>
+  <div className={`toast ${toast?'visible':''}`} role="status" aria-live="polite">{toast&&<><Icon name="check"/>{toast}</>}</div>
+  {project&&<ProjectDialog project={project} lang={lang} t={t} onClose={()=>setProject(null)}/>}
+ </>;
 }
-
 export default App;

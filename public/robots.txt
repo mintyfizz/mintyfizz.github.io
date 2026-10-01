@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mintyfizz.github.io/sitemap.xml
