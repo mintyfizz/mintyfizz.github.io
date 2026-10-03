@@ -1,6 +1,6 @@
 # Nathan Gatse — portfolio
 
-A focused React / Vite portfolio in English (default), French, and Dutch, with a warm brown palette and light/dark appearance settings.
+A focused React / Vite portfolio in English (default), French, and Dutch, with a minimalist layout, warm brown typography, and light/dark appearance settings.
 
 ## Development
 
@@ -14,9 +14,11 @@ GitHub Pages deploys on pushes to `main` through `.github/workflows/deploy.yml`.
 
 ## Content
 
-- `src/content.js`: translations, four selected project case studies, skills, and contact links.
+- `src/content.js`: translations, four project summaries, skills, and contact links.
 - `src/App.jsx`: navigation, language/theme preferences, project dialogs, experience, and CV downloads.
-- `src/styles.css`: responsive layouts and appearance variables.
+- `src/styles.css`: responsive homepage layouts and shared appearance variables.
+- `src/CaseStudy.jsx` and `src/case-study.css`: full-screen project reading views, navigation, interactive workflows, and schemas.
+- `src/cases/`: complete translated case-study content and source references.
 - `public/cv/`: English and French CVs, with the company project anonymized for public sharing.
 
 Language and appearance preferences are saved locally. Direct language links use `?lang=fr` and `?lang=nl`. The Dutch website offers the English and French CVs. Further projects are linked through GitHub.
