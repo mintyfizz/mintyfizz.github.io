@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import CaseStudy from './CaseStudy';
 import { CONTACT, CV, copy, projects as selectedProjects, skillGroups } from './content';
 
 const languages = [{id:'en',label:'EN',name:'English'},{id:'fr',label:'FR',name:'Français'},{id:'nl',label:'NL',name:'Nederlands'}];
@@ -45,21 +46,10 @@ function Icon({name='arrow',className=''}) {
 }
 
 function ProjectCard({project,index,lang,t,onOpen}) {
- return <button className="project-card" type="button" onClick={event=>{event.currentTarget.focus();onOpen(project);}} aria-label={`${t.details}: ${project.title} ${local(project.subtitle,lang)}`}>
+ return <button className="project-card" type="button" onClick={event=>{event.currentTarget.focus();onOpen(project);}} aria-label={`${t.details}: ${local(project.title,lang)} ${local(project.subtitle,lang)}`}>
   <span className="project-index">{String(index + 1).padStart(2, '0')}</span>
-  <div className="project-card-body"><span className="project-category">{t.filters[categories.indexOf(project.category)]||'GitHub'} <span>↗</span></span><h3>{project.title}<span>{local(project.subtitle,lang)}</span></h3><p>{local(project.summary,lang)}</p><div className="project-tags">{project.stack.slice(0,3).map(tool=><span key={tool}>{toolLabel(tool,lang)}</span>)}</div><div className="project-card-footer"><span>{local(project.metrics,lang)}</span><span className="round-arrow"><Icon name="arrow"/></span></div></div>
+  <div className="project-card-body"><span className="project-category">{t.filters[categories.indexOf(project.category)]||'GitHub'} <span>↗</span></span><h3>{local(project.title,lang)}<span>{local(project.subtitle,lang)}</span></h3><p>{local(project.summary,lang)}</p><div className="project-tags">{project.stack.slice(0,3).map(tool=><span key={tool}>{toolLabel(tool,lang)}</span>)}</div><div className="project-card-footer"><span>{local(project.metrics,lang)}</span><span className="round-arrow"><Icon name="arrow"/></span></div></div>
  </button>;
-}
-
-function ProjectDialog({project,lang,t,onClose}) {
- const ref=useRef(null);
- const opener=useRef(document.activeElement);
- useEffect(()=>{const dialog=ref.current;if(!dialog)return;dialog.showModal();const overflow=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{dialog.close();document.body.style.overflow=overflow;opener.current?.focus({preventScroll:true});};},[]);
- return <dialog ref={ref} className="project-dialog" onCancel={e=>{e.preventDefault();onClose();}} onClick={e=>{if(e.target===ref.current)onClose();}} aria-labelledby="dialog-title">
-  <div className="dialog-content"><button type="button" className="dialog-close icon-button" onClick={onClose} aria-label={t.close}><Icon name="close"/></button><div className="dialog-copy"><p className="eyebrow">{t.caseStudy} / {project.team?t.team:local(project.metrics,lang)}</p><h2 id="dialog-title">{project.title}<span>{local(project.subtitle,lang)}</span></h2><p className="dialog-lead">{local(project.summary,lang)}</p>
-  {['context','approach','outcome'].map(key=>project[key]?<div className="case-section" key={key}><h3>{t[key]}</h3><p>{local(project[key],lang)}</p></div>:null)}
-  <h3 className="tools-heading">{t.tools}</h3><div className="project-tags">{project.stack.map(tool=><span key={tool}>{toolLabel(tool,lang)}</span>)}</div><a className="button button-dark" href={project.url||`mailto:${CONTACT.email}?subject=${encodeURIComponent(project.title)}`} target={project.url?'_blank':undefined} rel={project.url?'noreferrer':undefined}>{project.url?t.source:t.discuss}<Icon name="external"/></a></div></div>
- </dialog>;
 }
 
 function App() {
@@ -67,7 +57,7 @@ function App() {
  const [theme,setTheme]=useState(()=>readPreference('ng-theme','latte')==='espresso'?'espresso':'latte');
  const [menuOpen,setMenuOpen]=useState(false);
  const [activeSection,setActiveSection]=useState('');
- const [project,setProject]=useState(null);
+ const [project,setProject]=useState(()=>selectedProjects.find(p=>p.id===new URLSearchParams(location.search).get('project'))||null);
  const t=copy[lang];
  useEffect(()=>{
   document.documentElement.lang=lang;
@@ -78,7 +68,7 @@ function App() {
   document.querySelector('meta[name="twitter:title"]')?.setAttribute('content',document.title);
   document.querySelector('meta[name="twitter:description"]')?.setAttribute('content',t.description);
   document.querySelector('link[rel="canonical"]')?.setAttribute('href',`https://mintyfizz.github.io/${lang==='en'?'':`?lang=${lang}`}`);
-  const url=new URL(location.href);if(lang==='en')url.searchParams.delete('lang');else url.searchParams.set('lang',lang);history.replaceState(null,'',url);
+  const url=new URL(location.href);if(lang==='en')url.searchParams.delete('lang');else url.searchParams.set('lang',lang);history.replaceState(history.state,'',url);
   try{localStorage.setItem('ng-language',lang);}catch{}
  },[lang,t]);
  useEffect(()=>{document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',theme==='espresso'?'#1e1714':'#faf7f2');try{localStorage.setItem('ng-theme',theme);}catch{}},[theme]);
@@ -89,6 +79,9 @@ function App() {
  },[]);
 
  useEffect(()=>{if(!menuOpen)return;function escape(e){if(e.key==='Escape'){setMenuOpen(false);document.querySelector('.menu-toggle')?.focus();}}document.addEventListener('keydown',escape);return()=>document.removeEventListener('keydown',escape);},[menuOpen]);
+ useEffect(()=>{function restore(){const params=new URLSearchParams(location.search);setProject(selectedProjects.find(p=>p.id===params.get('project'))||null);setLang(copy[params.get('lang')]?params.get('lang'):'en');}window.addEventListener('popstate',restore);return()=>window.removeEventListener('popstate',restore);},[]);
+ function openProject(next){const url=new URL(location.href);url.searchParams.set('project',next.id);history.pushState({portfolioCase:true},'',url);setProject(next);}
+ function closeProject(){if(history.state?.portfolioCase){history.back();}else{const url=new URL(location.href);url.searchParams.delete('project');history.replaceState(null,'',url);setProject(null);}}
  function switchLanguage(id){setLang(id);setMenuOpen(false);}
  return <>
   <a className="skip-link" href="#main">{t.skip}</a>
@@ -103,7 +96,7 @@ function App() {
 
    <section className="work-section section-width section-pad" id="work" aria-labelledby="work-title">
     <div className="section-heading"><p className="eyebrow">{t.workEyebrow}</p><h2 id="work-title">{t.workTitle}</h2><p>{t.workDescription}</p></div>
-    <div className="projects-grid">{portfolioProjects.map((p,index)=><ProjectCard key={p.id} project={p} index={index} lang={lang} t={t} onOpen={setProject}/>)}</div>
+    <div className="projects-grid">{portfolioProjects.map((p,index)=><ProjectCard key={p.id} project={p} index={index} lang={lang} t={t} onOpen={openProject}/>)}</div>
     <div className="work-footer"><a className="text-link" href={CONTACT.github} target="_blank" rel="noreferrer">{t.githubMore}<Icon name="external"/></a></div>
    </section>
    <section className="about-section" id="about" aria-labelledby="about-title"><div className="section-width section-pad"><div className="about-grid"><div className="about-heading"><p className="eyebrow">{t.aboutEyebrow}</p><h2 id="about-title">{t.aboutTitle}</h2></div><div className="about-copy">{t.aboutParagraphs.map((p,i)=><p key={i}>{p}</p>)}<a className="text-link" href={CONTACT.linkedin} target="_blank" rel="noreferrer">{t.linkedinCta}<Icon name="external"/></a><div className="language-card"><h3><Icon name="globe"/>{t.languageTitle}</h3><div>{t.languages.map((language,i)=><p key={language}><strong>{language}</strong><span>{t.fluency[i]}</span></p>)}</div></div></div></div>
@@ -120,7 +113,7 @@ function App() {
   </main>
   <footer className="site-footer section-width"><a className="brand-monogram" href="#top">ng.</a><span>© {new Date().getFullYear()} Nathan Gatse</span><a href="#top">{t.top}<Icon name="arrow"/></a></footer>
 
-  {project&&<ProjectDialog project={project} lang={lang} t={t} onClose={()=>setProject(null)}/>}
+  {project&&<CaseStudy key={project.id} project={project} lang={lang} onLanguage={switchLanguage} onClose={closeProject}/>}
  </>;
 }
 export default App;

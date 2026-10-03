@@ -452,12 +452,12 @@ export const projects = [
     "url": "https://github.com/mintyfizz/cemac-data-observatory"
   },
   {
-    "id": "4viso",
-    "title": "4VISO",
+    "id": "pharmaceutical-logistics-platform",
+    "title": {"en":"Pharmaceutical Logistics Platform","fr":"Plateforme de logistique pharmaceutique","nl":"Platform voor farmaceutieke logistiek"},
     "subtitle": {
-      "en": "Pharmaceutical logistics",
-      "fr": "Logistique pharmaceutique",
-      "nl": "Farmaceutieke logistiek"
+      "en": "Shipment tracking & audit workflows",
+      "fr": "Suivi des expéditions et audits",
+      "nl": "Zendingtracking en auditprocessen"
     },
     "category": "applications",
     "team": true,

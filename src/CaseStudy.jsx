@@ -1,0 +1,85 @@
+import { useEffect, useRef, useState } from 'react';
+import trade from './cases/trade';
+import readiness from './cases/readiness';
+import nature from './cases/nature';
+import logistics from './cases/logistics';
+import { CONTACT } from './content';
+
+const cases = {
+  'cemac-ecowas-aes-trade-observatory': trade,
+  'cemac-data-observatory': readiness,
+  'pharmaceutical-logistics-platform': logistics,
+  NatuurSpotter: nature,
+};
+const text = (value, lang) => typeof value === 'object' ? value[lang] : value;
+const labels = {
+  en: { overview:'Purpose & direction', architecture:'How it works', decisions:'Design choices', example:'In practice', results:'Results & limits', aim:'The aim', audience:'Who it serves', role:'My contribution', direction:'The direction taken', select:'Select a step to explore its input, transformation and output.', input:'Input', output:'Output', model:'Data structure', relationships:'How the parts connect', outcomes:'What it delivers', limits:'What to keep in mind', sources:'Explore the evidence', sourceNote:'Source links point to the code version used for this case study.', discuss:'Discuss this project', close:'Close case study', language:'Language', caseStudy:'Project case study', monthly:'Date-based collection → monthly analysis', map:'Daily records → geographic view', species:'Independent lookups by species', step:'Step', reading:'Purpose. System. Decisions.' },
+  fr: { overview:'Objectif et direction', architecture:'Fonctionnement', decisions:'Choix de conception', example:'En pratique', results:'Résultats et limites', aim:'L’objectif', audience:'Pour qui', role:'Ma contribution', direction:'La direction choisie', select:'Sélectionnez une étape pour explorer son entrée, sa transformation et sa sortie.', input:'Entrée', output:'Sortie', model:'Structure des données', relationships:'Les liens entre les éléments', outcomes:'Ce que le projet apporte', limits:'Les points à garder en tête', sources:'Explorer les sources', sourceNote:'Les liens renvoient à la version du code utilisée pour cette étude de cas.', discuss:'Discuter de ce projet', close:'Fermer l’étude de cas', language:'Langue', caseStudy:'Étude de projet', monthly:'Collecte quotidienne → analyse mensuelle', map:'Données quotidiennes → vue géographique', species:'Recherches indépendantes par espèce', step:'Étape', reading:'Objectif. Système. Décisions.' },
+  nl: { overview:'Doel en richting', architecture:'Hoe het werkt', decisions:'Ontwerpkeuzes', example:'In de praktijk', results:'Resultaten en grenzen', aim:'Het doel', audience:'Voor wie', role:'Mijn bijdrage', direction:'De gekozen richting', select:'Selecteer een stap om de invoer, verwerking en uitvoer te bekijken.', input:'Invoer', output:'Uitvoer', model:'Gegevensstructuur', relationships:'Hoe de onderdelen samenhangen', outcomes:'Wat het oplevert', limits:'Waar je rekening mee houdt', sources:'Bekijk de bronnen', sourceNote:'Bronlinks verwijzen naar de codeversie die voor deze casestudy is gebruikt.', discuss:'Bespreek dit project', close:'Casestudy sluiten', language:'Taal', caseStudy:'Projectcasestudy', monthly:'Dagelijkse verzameling → maandanalyse', map:'Daggegevens → geografisch overzicht', species:'Onafhankelijke opzoekingen per soort', step:'Stap', reading:'Doel. Systeem. Keuzes.' },
+};
+
+function Workflow({ study, projectId, lang, ui }) {
+  const [active, setActive] = useState(0);
+  const buttons = useRef([]);
+  const current = study.stages[active];
+  const groups = projectId === 'NatuurSpotter'
+    ? [{label:ui.monthly,indices:[0,1,2]}, {label:ui.map,indices:[3]}, {label:ui.species,indices:[4,5],parallel:true}]
+    : [{indices:study.stages.map((_,i)=>i)}];
+  function navigate(event, index) {
+    const keys = ['ArrowRight','ArrowLeft','ArrowDown','ArrowUp','Home','End'];
+    if (!keys.includes(event.key)) return;
+    event.preventDefault();
+    const count = study.stages.length;
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? count - 1 : (index + (['ArrowRight','ArrowDown'].includes(event.key) ? 1 : -1) + count) % count;
+    setActive(next);
+    buttons.current[next]?.focus();
+  }
+  return <div className="workflow">
+    <p className="diagram-instruction">{ui.select}</p>
+    <div role="tablist" aria-label={ui.architecture} className="workflow-groups">
+      {groups.map((group, g)=><div className="workflow-group" key={g} role="presentation">
+        {group.label && <p className="workflow-branch" role="presentation">{group.label}</p>}
+        <div className={`workflow-track ${group.parallel ? 'parallel' : ''}`} style={{'--step-count':group.indices.length}} role="presentation">
+          {group.indices.map(index=>{const stage=study.stages[index];return <button key={stage.id} ref={node=>{buttons.current[index]=node;}} id={`stage-${stage.id}`} type="button" role="tab" aria-selected={active===index} aria-controls="stage-detail" tabIndex={active===index?0:-1} onClick={()=>setActive(index)} onKeyDown={event=>navigate(event,index)}>
+            <span className="step-index">{String(index+1).padStart(2,'0')}</span><strong>{text(stage.title,lang)}</strong><span className="step-tool">{text(stage.tool,lang)}</span>
+          </button>;})}
+        </div>
+      </div>)}
+    </div>
+    <div className="stage-detail" id="stage-detail" role="tabpanel" aria-labelledby={`stage-${current.id}`} tabIndex={0}>
+      <div className="stage-heading"><span>{ui.step} {String(active+1).padStart(2,'0')}</span><h4>{text(current.title,lang)}</h4></div>
+      <p>{text(current.description,lang)}</p>
+      <dl className="stage-io"><div><dt>{ui.input}</dt><dd>{text(current.input,lang)}</dd></div><div><dt>{ui.output}</dt><dd>{text(current.output,lang)}</dd></div></dl>
+    </div>
+  </div>;
+}
+
+export default function CaseStudy({project,lang,onLanguage,onClose}) {
+  const ref=useRef(null);
+  const opener=useRef(document.activeElement);
+  const heading=useRef(null);
+  const study=cases[project.id];
+  const ui=labels[lang];
+  useEffect(()=>{
+    const dialog=ref.current;
+    dialog.showModal();
+    heading.current?.focus({preventScroll:true});
+    const overflow=document.body.style.overflow;
+    document.body.style.overflow='hidden';
+    return()=>{dialog.close();document.body.style.overflow=overflow;opener.current?.focus({preventScroll:true});};
+  },[]);
+  function jump(id) { const section=ref.current.querySelector(`#case-${id}`);section?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});section?.focus({preventScroll:true}); }
+  return <dialog ref={ref} className="project-dialog" onCancel={event=>{event.preventDefault();onClose();}} onClick={event=>{if(event.target===ref.current)onClose();}} aria-labelledby="case-title">
+    <div className="case-toolbar"><span>{ui.caseStudy}</span><div className="case-controls"><div className="language-picker" role="group" aria-label={ui.language}>{[{id:'en',name:'English'},{id:'fr',name:'Français'},{id:'nl',name:'Nederlands'}].map(l=><button key={l.id} type="button" aria-label={l.name} aria-pressed={lang===l.id} lang={l.id} onClick={()=>onLanguage(l.id)}>{l.id.toUpperCase()}</button>)}</div><button type="button" className="icon-button case-close" onClick={onClose} aria-label={ui.close}><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div></div>
+    <article className="case-content">
+      <header className="case-hero"><p className="eyebrow">{text(project.metrics,lang)}</p><h2 id="case-title" ref={heading} tabIndex={-1}>{text(project.title,lang)}<span>{text(project.subtitle,lang)}</span></h2><p>{text(study.aim,lang)}</p><div className="case-index" aria-hidden="true">{ui.reading}</div></header>
+      <nav className="case-nav" aria-label={ui.caseStudy}>{['overview','architecture','decisions','example','results'].map((id,i)=><button key={id} onClick={()=>jump(id)} type="button"><span>{String(i+1).padStart(2,'0')}</span>{ui[id]}</button>)}</nav>
+      <section id="case-overview" className="case-block" tabIndex={-1}><div className="case-section-heading"><span>01</span><h3>{ui.overview}</h3></div><dl className="case-facts"><div><dt>{ui.audience}</dt><dd>{text(study.audience,lang)}</dd></div><div><dt>{ui.role}</dt><dd>{text(study.role,lang)}</dd></div></dl><div className="case-direction"><h4>{ui.direction}</h4><p>{text(study.direction,lang)}</p></div></section>
+      <section id="case-architecture" className="case-block" tabIndex={-1}><div className="case-section-heading"><span>02</span><h3>{ui.architecture}</h3></div><Workflow study={study} projectId={project.id} lang={lang} ui={ui}/><figure className="data-model"><figcaption><span className="eyebrow">{ui.model}</span><h4>{text(study.model.title,lang)}</h4><p>{text(study.model.caption,lang)}</p></figcaption><div className="model-entities">{study.model.entities.map((entity,i)=><div className="model-entity" key={i}><header><span className="entity-index">{String(i+1).padStart(2,'0')}</span><h5>{text(entity.name,lang)}</h5></header><p>{text(entity.kind,lang)}</p>{entity.fields.length > 0 && <ul>{entity.fields.map((field,j)=><li key={j}><code>{text(field,lang)}</code></li>)}</ul>}</div>)}</div><div className="model-relationships"><h5>{ui.relationships}</h5><ul>{study.model.relationships.map((relation,i)=><li key={i}><span aria-hidden="true">↳</span><p>{text(relation,lang)}</p></li>)}</ul></div></figure></section>
+      <section id="case-decisions" className="case-block" tabIndex={-1}><div className="case-section-heading"><span>03</span><h3>{ui.decisions}</h3></div><div className="case-decisions">{study.decisions.map((decision,i)=><article key={i}><span className="decision-number">{String(i+1).padStart(2,'0')}</span><div><h4>{text(decision.title,lang)}</h4><p>{text(decision.reason,lang)}</p></div></article>)}</div></section>
+      <section id="case-example" className="case-block" tabIndex={-1}><div className="case-section-heading"><span>04</span><h3>{ui.example}</h3></div><div className="case-example"><h4>{text(study.walkthrough.title,lang)}</h4><ol>{study.walkthrough.steps.map((step,i)=><li key={i}><p>{text(step,lang)}</p></li>)}</ol></div></section>
+      <section id="case-results" className="case-block" tabIndex={-1}><div className="case-section-heading"><span>05</span><h3>{ui.results}</h3></div><div className="case-results"><div><h4>{ui.outcomes}</h4><ul>{study.outcomes.map((outcome,i)=><li key={i}>{text(outcome,lang)}</li>)}</ul></div><div><h4>{ui.limits}</h4><ul>{study.limitations.map((limit,i)=><li key={i}>{text(limit,lang)}</li>)}</ul></div></div></section>
+      <footer className="case-sources"><h3>{ui.sources}</h3>{project.url && <p>{ui.sourceNote}</p>}<div>{study.sources.map((source,i)=><a key={i} href={source.url} target="_blank" rel="noreferrer">{text(source.label,lang)}<span aria-hidden="true">↗</span></a>)}</div><a className="text-link case-contact" href={`mailto:${CONTACT.email}?subject=${encodeURIComponent(text(project.title,lang))}`}>{ui.discuss}<span aria-hidden="true">↗</span></a></footer>
+    </article>
+  </dialog>;
+}
