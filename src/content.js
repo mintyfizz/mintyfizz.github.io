@@ -1,65 +1,539 @@
-export const CONTACT = { email: 'nathangatse@outlook.com', linkedin: 'https://www.linkedin.com/in/thomasgatse/', github: 'https://github.com/mintyfizz' };
-export const CV = { en: '/cv/Nathan_Gatse_CV_EN_F.pdf', fr: '/cv/Nathan_Gatse_CV_FR.pdf' };
+export const CONTACT = {
+  "email": "nathangatse@outlook.com",
+  "linkedin": "https://www.linkedin.com/in/thomasgatse/",
+  "github": "https://github.com/mintyfizz"
+};
+
+export const CV = {
+  "en": "/cv/Nathan_Gatse_CV_EN_F.pdf",
+  "fr": "/cv/Nathan_Gatse_CV_FR.pdf"
+};
+
 export const copy = {
-  en: {
-    nav: ['Work', 'About', 'Journey', 'Contact'], skip: 'Skip to content', menu: 'Open navigation', closeMenu: 'Close navigation', language: 'Website language', theme: 'Switch appearance', latte: 'Latte', espresso: 'Espresso',
-    availability: 'Looking for a data internship · 2027', location: 'Mechelen, Belgium', heroTop: 'BUSINESS MIND. DATA CURIOSITY.', heroTitle: ['A little curiosity.', 'A lot of possibility.'], heroDescription: 'I’m Nathan. I connect business questions with data, building thoughtful pipelines, useful dashboards, and clearer decisions.', workCta: 'Discover my work', cvCta: 'Download CV', scroll: 'A closer look', disciplines: ['Data analytics', 'Business intelligence', 'Data engineering', 'Open data'],
-    labTitle: 'The data lab', labSubtitle: 'From a question to an insight.', labDemo: 'Interactive pipeline illustration', play: 'Run the pipeline', reset: 'Start again', complete: 'Pipeline complete', steps: ['Collect', 'Transform', 'Understand'], stepTitles: ['Good questions. Raw ingredients.', 'Structure brings clarity.', 'Make the data useful.'], stepDescriptions: ['Start with public APIs, events, and business questions.', 'Clean, test, and model data into reliable foundations.', 'Turn a dependable dataset into a readable dashboard.'], chartLabel: 'Illustrative dashboard', labStatus: ['Ready to explore', 'Modelling the data', 'Ready for insight'],
-    stats: [{value:'21',label:'countries in the trade lakehouse'}, {value:'10',label:'World Bank indicators'}, {value:'3',label:'languages: EN · FR · NL'}],
-    workEyebrow: '01 / SELECTED WORK', workTitle: 'Built to make a difference.', workDescription: 'From African trade flows to biodiversity in Belgium. Different questions, the same curiosity.', filters: ['All work', 'Engineering', 'Analytics', 'Applications'], search: 'Find a project or technology', searchLabel: 'Search projects', clear: 'Clear search', noResults: 'No projects match. Try another search or category.', resetFilters: 'Show all projects', details: 'Explore project', source: 'View source', caseStudy: 'Project notes', close: 'Close project', context: 'The question', approach: 'The approach', outcome: 'The result', tools: 'Built with', projectCount: 'projects', githubMore: 'Explore GitHub', fresh: 'Public GitHub projects', curated: 'Selected projects', repoFallback: 'Explore the code and documentation behind this project on GitHub.', team: 'Team project', discuss: 'Talk about this project',
-    aboutEyebrow: '02 / THE PERSON BEHIND THE PROJECTS', aboutTitle: 'Business perspective.\nBuilder’s mindset.', aboutParagraphs: ['Originally from the Republic of Congo, now studying in Mechelen, Belgium. I’m drawn to the space where business, technology, and useful information meet.', 'At Thomas More, I study International Business Management with a specialisation in International Applied Data Intelligence. Outside class, I learn by building complete systems, asking better questions, and following the data.', 'My ambition is to make data more useful to people and institutions, especially in Congo and across Africa.'], linkedinCta: 'More about me on LinkedIn', languageTitle: 'A multilingual perspective', languages: ['English', 'French', 'Dutch'], fluency: ['Fluent', 'Fluent', 'Elementary'],
-    skillsTitle: 'A toolkit with a purpose.', skillsDescription: 'Practical tools I use to move from raw data to meaningful answers.', skillTabs: ['Analyse', 'Engineer', 'Communicate'], skillDescriptions: ['Explore patterns, define KPIs, and build reports people can actually use.', 'Design tested pipelines and dependable models, from source to warehouse.', 'Translate a business need into a clear brief, a working prototype, and a useful result.'],
-    journeyEyebrow: '03 / LEARNING & EXPERIENCE', journeyTitle: 'Every step adds perspective.', experience: 'Experience', education: 'Education', certifications: 'Certifications', present: '2025 — present', viewJourney: 'Read more',
-    auditTitle: 'Audit intern', auditPlace: 'Exco CACOGES · Brazzaville, Republic of the Congo', auditBody: 'Analysed client financial records, identified reconciliation errors, maintained Excel consolidation models, and supported risk assessments under senior auditor supervision.',
-    schoolTitle: 'International Business Management', schoolSubtitle: 'International Applied Data Intelligence · Thomas More', schoolBody: 'Professional bachelor in Mechelen, combining international business with applied data intelligence. Studying since February 2025.',
-    kuTitle: 'Business Engineering coursework', kuBody: 'Coursework at KU Leuven before transferring to Thomas More. This was a period of study, not a completed degree.', ibTitle: 'International Baccalaureate diploma', ibBody: 'St. John’s International School · Waterloo, Belgium', certBody: 'Building foundations through structured learning and practical projects.',
-    cvTitle: 'The full picture, in a PDF.', cvDescription: 'Experience, education, tools, and projects. Choose the original English or French CV.', englishCV: 'English CV', frenchCV: 'French CV', download: 'Download', originalCV: 'Original documents · PDF',
-    contactEyebrow: '04 / LET’S CONNECT', contactTitle: ['Good work starts', 'with a conversation.'], contactDescription: 'Have a data question, a project idea, or a 2027 internship opportunity? I’d love to hear about it.', emailCta: 'Say hello', copyEmail: 'Copy email address', copied: 'Email copied', copyFailed: 'Couldn’t copy. Email me using the link.', internship: 'Data analytics · BI · Reporting', internshipDetail: 'Seeking an internship in 2027. A school internship agreement is available.', footer: 'Made with curiosity. And a little coffee.', top: 'Back to top', description: 'Nathan Gatse’s portfolio: data analytics, business intelligence, engineering projects, and a business perspective from Congo to Belgium.'
+  "en": {
+    "nav": [
+      "Projects",
+      "About",
+      "Experience",
+      "Contact"
+    ],
+    "skip": "Skip to content",
+    "menu": "Open navigation",
+    "closeMenu": "Close navigation",
+    "language": "Website language",
+    "theme": "Switch appearance",
+    "latte": "Light",
+    "espresso": "Dark",
+    "availability": "Looking for a data internship · 2027",
+    "location": "Mechelen, Belgium",
+    "heroTop": "Data analytics & business intelligence",
+    "heroTitle": [
+      "Nathan",
+      "Gatse"
+    ],
+    "heroDescription": "Student at Thomas More in Mechelen. I use Python, SQL, and BI tools to build data pipelines and dashboards.",
+    "workCta": "View projects",
+    "cvCta": "Download CV",
+    "disciplines": [
+      "Data analytics",
+      "Business intelligence",
+      "Data engineering",
+      "Open data"
+    ],
+    "workEyebrow": "01 / PROJECTS",
+    "workTitle": "Selected projects",
+    "workDescription": "Data engineering, analytics, and applications. Each project includes its approach, tools, and results.",
+    "filters": [
+      "All projects",
+      "Data engineering",
+      "Analytics",
+      "Applications"
+    ],
+    "details": "View project",
+    "source": "View source",
+    "caseStudy": "Project details",
+    "close": "Close project",
+    "context": "Objective",
+    "approach": "Approach",
+    "outcome": "Result",
+    "tools": "Tools",
+    "githubMore": "View GitHub",
+    "team": "Team project",
+    "discuss": "Discuss this project",
+    "aboutEyebrow": "02 / ABOUT",
+    "aboutTitle": "About",
+    "aboutParagraphs": [
+      "I’m from the Republic of Congo and based in Mechelen, Belgium. I study International Business Management at Thomas More, specialising in International Applied Data Intelligence.",
+      "My projects cover African trade, digital readiness, and public data. I have also supported financial audits as an intern at Exco CACOGES in Brazzaville."
+    ],
+    "linkedinCta": "View LinkedIn profile",
+    "languageTitle": "Languages",
+    "languages": [
+      "English",
+      "French",
+      "Dutch"
+    ],
+    "fluency": [
+      "Fluent",
+      "Fluent",
+      "Elementary"
+    ],
+    "skillsTitle": "Skills",
+    "skillTabs": [
+      "Analytics",
+      "Data engineering",
+      "Collaboration"
+    ],
+    "skillDescriptions": [
+      "Data analysis, KPI definitions, and reporting.",
+      "Data pipelines, testing, and warehouse modelling.",
+      "Requirements analysis, prototyping, and project collaboration."
+    ],
+    "journeyEyebrow": "03 / BACKGROUND",
+    "journeyTitle": "Experience & education",
+    "experience": "Experience",
+    "education": "Education",
+    "certifications": "Certifications",
+    "present": "2025 — present",
+    "auditTitle": "Audit intern",
+    "auditPlace": "Exco CACOGES · Brazzaville, Republic of the Congo",
+    "auditBody": "Analysed client financial records, identified reconciliation errors, maintained Excel consolidation models, and supported risk assessments under senior auditor supervision.",
+    "schoolTitle": "International Business Management",
+    "schoolSubtitle": "International Applied Data Intelligence · Thomas More",
+    "schoolBody": "Professional bachelor in Mechelen, combining international business with applied data intelligence. Started in February 2025.",
+    "kuTitle": "Business Engineering coursework",
+    "kuBody": "Coursework at KU Leuven before transferring to Thomas More; no degree awarded.",
+    "ibTitle": "International Baccalaureate diploma",
+    "ibBody": "St. John’s International School · Waterloo, Belgium",
+    "cvTitle": "Curriculum vitae",
+    "cvDescription": "Download my CV in English or French.",
+    "englishCV": "English CV",
+    "frenchCV": "French CV",
+    "contactEyebrow": "04 / CONTACT",
+    "contactTitle": [
+      "Contact",
+      ""
+    ],
+    "contactDescription": "For data analytics, business intelligence, or 2027 internship opportunities, contact me by email or LinkedIn.",
+    "internshipDetail": "Seeking an internship in 2027. A school internship agreement is available.",
+    "top": "Back to top",
+    "description": "Nathan Gatse — data analytics and business intelligence student at Thomas More. Projects, experience, education, and CV."
   },
-  fr: {
-    nav: ['Projets', 'À propos', 'Parcours', 'Contact'], skip: 'Aller au contenu', menu: 'Ouvrir la navigation', closeMenu: 'Fermer la navigation', language: 'Langue du site', theme: 'Changer l’apparence', latte: 'Latte', espresso: 'Espresso',
-    availability: 'À la recherche d’un stage data · 2027', location: 'Malines, Belgique', heroTop: 'L’ESPRIT BUSINESS. LA CURIOSITÉ DATA.', heroTitle: ['Un peu de curiosité.', 'Tant de possibilités.'], heroDescription: 'Moi, c’est Nathan. Je relie les questions métier aux données pour créer des pipelines réfléchis, des tableaux de bord utiles et des décisions plus claires.', workCta: 'Découvrir mes projets', cvCta: 'Télécharger le CV', scroll: 'Découvrir la suite', disciplines: ['Analyse de données', 'Business intelligence', 'Ingénierie des données', 'Données ouvertes'],
-    labTitle: 'Le labo data', labSubtitle: 'De la question à la compréhension.', labDemo: 'Illustration interactive d’un pipeline', play: 'Lancer le pipeline', reset: 'Recommencer', complete: 'Pipeline terminé', steps: ['Collecter', 'Transformer', 'Comprendre'], stepTitles: ['Des questions. Des données brutes.', 'La structure apporte de la clarté.', 'Rendre les données utiles.'], stepDescriptions: ['Partir d’API publiques, d’événements et de questions métier.', 'Nettoyer, tester et modéliser les données sur des bases fiables.', 'Transformer un jeu de données fiable en tableau de bord lisible.'], chartLabel: 'Tableau de bord illustratif', labStatus: ['Prêt à explorer', 'Modélisation des données', 'Prêt pour l’analyse'],
-    stats: [{value:'21',label:'pays dans le lakehouse commercial'}, {value:'10',label:'indicateurs de la Banque mondiale'}, {value:'3',label:'langues : EN · FR · NL'}],
-    workEyebrow: '01 / UNE SÉLECTION DE PROJETS', workTitle: 'Construire pour être utile.', workDescription: 'Des échanges commerciaux africains à la biodiversité en Belgique. Des questions différentes, une même curiosité.', filters: ['Tous', 'Ingénierie', 'Analyse', 'Applications'], search: 'Rechercher un projet ou un outil', searchLabel: 'Rechercher des projets', clear: 'Effacer la recherche', noResults: 'Aucun projet trouvé. Essayez une autre recherche ou catégorie.', resetFilters: 'Afficher tous les projets', details: 'Découvrir le projet', source: 'Voir le code', caseStudy: 'Notes de projet', close: 'Fermer le projet', context: 'La question', approach: 'La démarche', outcome: 'Le résultat', tools: 'Les outils', projectCount: 'projets', githubMore: 'Explorer GitHub', fresh: 'Projets GitHub publics', curated: 'Projets sélectionnés', repoFallback: 'Découvrez le code et la documentation de ce projet sur GitHub.', team: 'Projet d’équipe', discuss: 'Échanger sur ce projet',
-    aboutEyebrow: '02 / DERRIÈRE LES PROJETS', aboutTitle: 'Le regard business.\nL’envie de construire.', aboutParagraphs: ['Originaire de la République du Congo, j’étudie aujourd’hui à Malines, en Belgique. Ce qui m’attire, c’est la rencontre entre le business, la technologie et l’information utile.', 'À Thomas More, je suis le bachelier en International Business Management, avec la spécialisation International Applied Data Intelligence. En dehors des cours, j’apprends en construisant des systèmes complets et en posant de meilleures questions.', 'Mon ambition : rendre les données plus utiles aux personnes et aux institutions, notamment au Congo et à travers l’Afrique.'], linkedinCta: 'Mon profil LinkedIn', languageTitle: 'Une perspective multilingue', languages: ['Anglais', 'Français', 'Néerlandais'], fluency: ['Courant', 'Courant', 'Notions'],
-    skillsTitle: 'Des outils, avec une intention.', skillsDescription: 'Des outils concrets pour transformer les données brutes en réponses utiles.', skillTabs: ['Analyser', 'Construire', 'Communiquer'], skillDescriptions: ['Explorer les tendances, définir les KPI et créer des rapports vraiment utiles.', 'Concevoir des pipelines testés et des modèles fiables, de la source à l’entrepôt.', 'Traduire un besoin métier en un brief clair, un prototype et un résultat concret.'],
-    journeyEyebrow: '03 / FORMATION & EXPÉRIENCE', journeyTitle: 'Chaque étape élargit le regard.', experience: 'Expérience', education: 'Formation', certifications: 'Certifications', present: '2025 — aujourd’hui', viewJourney: 'En savoir plus',
-    auditTitle: 'Stagiaire en audit', auditPlace: 'Exco CACOGES · Brazzaville, République du Congo', auditBody: 'Analyse des données financières clients, identification d’erreurs de rapprochement, maintenance de modèles de consolidation Excel et participation aux évaluations des risques sous supervision.',
-    schoolTitle: 'International Business Management', schoolSubtitle: 'International Applied Data Intelligence · Thomas More', schoolBody: 'Bachelier professionnalisant à Malines, associant business international et intelligence des données appliquée. Études commencées en février 2025.',
-    kuTitle: 'Cursus en ingénierie de gestion', kuBody: 'Cours suivis à KU Leuven avant la réorientation vers Thomas More. Il s’agit d’un cursus suivi, sans diplôme obtenu.', ibTitle: 'Diplôme du Baccalauréat International', ibBody: 'St. John’s International School · Waterloo, Belgique', certBody: 'Des bases renforcées par des formations structurées et des projets concrets.',
-    cvTitle: 'Le parcours complet, en PDF.', cvDescription: 'Expérience, formation, outils et projets. Choisissez le CV original en anglais ou en français.', englishCV: 'CV anglais', frenchCV: 'CV français', download: 'Télécharger', originalCV: 'Documents originaux · PDF',
-    contactEyebrow: '04 / ÉCHANGEONS', contactTitle: ['Tout commence', 'par une conversation.'], contactDescription: 'Une question data, une idée de projet ou une opportunité de stage en 2027 ? Je serais ravi d’en discuter.', emailCta: 'Me contacter', copyEmail: 'Copier l’adresse e-mail', copied: 'Adresse copiée', copyFailed: 'Copie impossible. Utilisez le lien e-mail.', internship: 'Analyse de données · BI · Reporting', internshipDetail: 'À la recherche d’un stage en 2027. Convention de stage disponible.', footer: 'Créé avec curiosité. Et un peu de café.', top: 'Retour en haut', description: 'Le portfolio de Nathan Gatse : analyse de données, business intelligence, projets data et un regard business entre le Congo et la Belgique.'
+  "fr": {
+    "nav": [
+      "Projets",
+      "À propos",
+      "Parcours",
+      "Contact"
+    ],
+    "skip": "Aller au contenu",
+    "menu": "Ouvrir la navigation",
+    "closeMenu": "Fermer la navigation",
+    "language": "Langue du site",
+    "theme": "Changer l’apparence",
+    "latte": "Clair",
+    "espresso": "Sombre",
+    "availability": "À la recherche d’un stage data · 2027",
+    "location": "Malines, Belgique",
+    "heroTop": "Analyse de données & business intelligence",
+    "heroTitle": [
+      "Nathan",
+      "Gatse"
+    ],
+    "heroDescription": "Étudiant à Thomas More, à Malines. J’utilise Python, SQL et des outils BI pour créer des pipelines de données et des tableaux de bord.",
+    "workCta": "Voir les projets",
+    "cvCta": "Télécharger le CV",
+    "disciplines": [
+      "Analyse de données",
+      "Business intelligence",
+      "Ingénierie des données",
+      "Données ouvertes"
+    ],
+    "workEyebrow": "01 / PROJETS",
+    "workTitle": "Projets sélectionnés",
+    "workDescription": "Ingénierie des données, analyse et applications. Chaque projet présente sa démarche, ses outils et ses résultats.",
+    "filters": [
+      "Tous les projets",
+      "Ingénierie data",
+      "Analyse",
+      "Applications"
+    ],
+    "details": "Voir le projet",
+    "source": "Voir le code",
+    "caseStudy": "Détails du projet",
+    "close": "Fermer le projet",
+    "context": "Objectif",
+    "approach": "Démarche",
+    "outcome": "Résultat",
+    "tools": "Outils",
+    "githubMore": "Voir GitHub",
+    "team": "Projet d’équipe",
+    "discuss": "Discuter de ce projet",
+    "aboutEyebrow": "02 / À PROPOS",
+    "aboutTitle": "À propos",
+    "aboutParagraphs": [
+      "Originaire de la République du Congo, je vis à Malines, en Belgique. J’étudie l’International Business Management à Thomas More, avec la spécialisation International Applied Data Intelligence.",
+      "Mes projets portent sur le commerce africain, la préparation numérique et les données publiques. J’ai également participé à des audits financiers lors d’un stage chez Exco CACOGES, à Brazzaville."
+    ],
+    "linkedinCta": "Voir mon profil LinkedIn",
+    "languageTitle": "Langues",
+    "languages": [
+      "Anglais",
+      "Français",
+      "Néerlandais"
+    ],
+    "fluency": [
+      "Courant",
+      "Courant",
+      "Notions"
+    ],
+    "skillsTitle": "Compétences",
+    "skillTabs": [
+      "Analyse",
+      "Ingénierie data",
+      "Collaboration"
+    ],
+    "skillDescriptions": [
+      "Analyse de données, définition de KPI et reporting.",
+      "Pipelines de données, tests et modélisation d’entrepôts.",
+      "Analyse des besoins, prototypage et travail en équipe."
+    ],
+    "journeyEyebrow": "03 / PARCOURS",
+    "journeyTitle": "Expérience et formation",
+    "experience": "Expérience",
+    "education": "Formation",
+    "certifications": "Certifications",
+    "present": "2025 — aujourd’hui",
+    "auditTitle": "Stagiaire en audit",
+    "auditPlace": "Exco CACOGES · Brazzaville, République du Congo",
+    "auditBody": "Analyse des données financières clients, identification d’erreurs de rapprochement, maintenance de modèles de consolidation Excel et participation aux évaluations des risques sous supervision.",
+    "schoolTitle": "International Business Management",
+    "schoolSubtitle": "International Applied Data Intelligence · Thomas More",
+    "schoolBody": "Bachelier professionnalisant à Malines, associant commerce international et intelligence des données appliquée. Études commencées en février 2025.",
+    "kuTitle": "Cursus en ingénierie de gestion",
+    "kuBody": "Cours suivis à KU Leuven avant la réorientation vers Thomas More, sans diplôme obtenu.",
+    "ibTitle": "Diplôme du Baccalauréat International",
+    "ibBody": "St. John’s International School · Waterloo, Belgique",
+    "cvTitle": "Curriculum vitae",
+    "cvDescription": "Téléchargez mon CV en anglais ou en français.",
+    "englishCV": "CV anglais",
+    "frenchCV": "CV français",
+    "contactEyebrow": "04 / CONTACT",
+    "contactTitle": [
+      "Contact",
+      ""
+    ],
+    "contactDescription": "Pour une opportunité en analyse de données, en business intelligence ou un stage en 2027, contactez-moi par e-mail ou sur LinkedIn.",
+    "internshipDetail": "À la recherche d’un stage en 2027. Convention de stage disponible.",
+    "top": "Retour en haut",
+    "description": "Nathan Gatse — étudiant en analyse de données et business intelligence à Thomas More. Projets, expérience, formation et CV."
   },
-  nl: {
-    nav: ['Projecten', 'Over mij', 'Loopbaan', 'Contact'], skip: 'Ga naar de inhoud', menu: 'Navigatie openen', closeMenu: 'Navigatie sluiten', language: 'Taal van de website', theme: 'Weergave wijzigen', latte: 'Latte', espresso: 'Espresso',
-    availability: 'Op zoek naar een datastage · 2027', location: 'Mechelen, België', heroTop: 'BUSINESSINZICHT. NIEUWSGIERIG NAAR DATA.', heroTitle: ['Een beetje nieuwsgierigheid.', 'Zoveel mogelijkheden.'], heroDescription: 'Ik ben Nathan. Ik verbind zakelijke vragen met data en bouw doordachte pipelines, bruikbare dashboards en heldere inzichten.', workCta: 'Ontdek mijn projecten', cvCta: 'Download cv', scroll: 'Ontdek meer', disciplines: ['Data-analyse', 'Business intelligence', 'Data-engineering', 'Open data'],
-    labTitle: 'Het datalab', labSubtitle: 'Van een vraag naar een inzicht.', labDemo: 'Interactieve illustratie van een pipeline', play: 'Start de pipeline', reset: 'Opnieuw beginnen', complete: 'Pipeline voltooid', steps: ['Verzamelen', 'Transformeren', 'Begrijpen'], stepTitles: ['Goede vragen. Ruwe gegevens.', 'Structuur geeft duidelijkheid.', 'Maak data bruikbaar.'], stepDescriptions: ['Begin met openbare API’s, gebeurtenissen en zakelijke vragen.', 'Maak data schoon, test ze en bouw betrouwbare modellen.', 'Zet een betrouwbare dataset om in een leesbaar dashboard.'], chartLabel: 'Illustratief dashboard', labStatus: ['Klaar om te verkennen', 'Data modelleren', 'Klaar voor analyse'],
-    stats: [{value:'21',label:'landen in het handelslakehouse'}, {value:'10',label:'indicatoren van de Wereldbank'}, {value:'3',label:'talen: EN · FR · NL'}],
-    workEyebrow: '01 / GESELECTEERDE PROJECTEN', workTitle: 'Gebouwd om iets te betekenen.', workDescription: 'Van Afrikaanse handelsstromen tot biodiversiteit in België. Andere vragen, dezelfde nieuwsgierigheid.', filters: ['Alle projecten', 'Engineering', 'Analyse', 'Applicaties'], search: 'Zoek een project of technologie', searchLabel: 'Projecten zoeken', clear: 'Zoekopdracht wissen', noResults: 'Geen projecten gevonden. Probeer een andere zoekopdracht of categorie.', resetFilters: 'Toon alle projecten', details: 'Ontdek het project', source: 'Bekijk de code', caseStudy: 'Projectnotities', close: 'Project sluiten', context: 'De vraag', approach: 'De aanpak', outcome: 'Het resultaat', tools: 'Gebouwd met', projectCount: 'projecten', githubMore: 'Ontdek GitHub', fresh: 'Openbare GitHub-projecten', curated: 'Geselecteerde projecten', repoFallback: 'Bekijk de code en documentatie van dit project op GitHub.', team: 'Teamproject', discuss: 'Bespreek dit project',
-    aboutEyebrow: '02 / DE PERSOON ACHTER DE PROJECTEN', aboutTitle: 'Businessinzicht.\nDe wil om te bouwen.', aboutParagraphs: ['Ik kom uit de Republiek Congo en studeer nu in Mechelen, België. Ik ben geïnteresseerd in de plek waar business, technologie en bruikbare informatie samenkomen.', 'Bij Thomas More studeer ik International Business Management, met de specialisatie International Applied Data Intelligence. Buiten de lessen leer ik door complete systemen te bouwen en betere vragen te stellen.', 'Mijn ambitie is om data bruikbaarder te maken voor mensen en instellingen, vooral in Congo en andere delen van Afrika.'], linkedinCta: 'Mijn LinkedIn-profiel', languageTitle: 'Een meertalig perspectief', languages: ['Engels', 'Frans', 'Nederlands'], fluency: ['Vloeiend', 'Vloeiend', 'Basiskennis'],
-    skillsTitle: 'Een toolkit met een doel.', skillsDescription: 'Praktische tools om ruwe gegevens om te zetten in betekenisvolle antwoorden.', skillTabs: ['Analyseren', 'Bouwen', 'Communiceren'], skillDescriptions: ['Ontdek patronen, definieer KPI’s en maak rapporten die mensen kunnen gebruiken.', 'Ontwerp geteste pipelines en betrouwbare modellen, van bron tot datawarehouse.', 'Vertaal een zakelijke behoefte naar een duidelijke briefing, een prototype en een bruikbaar resultaat.'],
-    journeyEyebrow: '03 / OPLEIDING & ERVARING', journeyTitle: 'Elke stap geeft een nieuw perspectief.', experience: 'Ervaring', education: 'Opleiding', certifications: 'Certificaten', present: '2025 — heden', viewJourney: 'Lees meer',
-    auditTitle: 'Auditstagiair', auditPlace: 'Exco CACOGES · Brazzaville, Republiek Congo', auditBody: 'Analyseerde financiële klantgegevens, identificeerde aansluitingsfouten, onderhield Excel-consolidatiemodellen en ondersteunde risicobeoordelingen onder begeleiding van senior auditors.',
-    schoolTitle: 'International Business Management', schoolSubtitle: 'International Applied Data Intelligence · Thomas More', schoolBody: 'Professionele bachelor in Mechelen, met internationaal businessinzicht en toegepaste data-intelligentie. Gestart in februari 2025.',
-    kuTitle: 'Studie handelsingenieur', kuBody: 'Vakken gevolgd aan KU Leuven vóór de overstap naar Thomas More. Dit was een studieperiode, geen behaald diploma.', ibTitle: 'International Baccalaureate-diploma', ibBody: 'St. John’s International School · Waterloo, België', certBody: 'Een sterke basis dankzij gestructureerde opleidingen en praktische projecten.',
-    cvTitle: 'Het complete verhaal, als PDF.', cvDescription: 'Ervaring, opleiding, tools en projecten. Kies het originele Engelse of Franse cv.', englishCV: 'Engels cv', frenchCV: 'Frans cv', download: 'Downloaden', originalCV: 'Originele documenten · PDF',
-    contactEyebrow: '04 / LATEN WE PRATEN', contactTitle: ['Goed werk begint', 'met een gesprek.'], contactDescription: 'Een datavraag, een projectidee of een stagekans in 2027? Ik hoor er graag meer over.', emailCta: 'Neem contact op', copyEmail: 'E-mailadres kopiëren', copied: 'E-mailadres gekopieerd', copyFailed: 'Kopiëren mislukt. Gebruik de e-maillink.', internship: 'Data-analyse · BI · Rapportage', internshipDetail: 'Op zoek naar een stage in 2027. Een stageovereenkomst via de hogeschool is beschikbaar.', footer: 'Gemaakt met nieuwsgierigheid. En een beetje koffie.', top: 'Terug naar boven', description: 'Het portfolio van Nathan Gatse: data-analyse, business intelligence, dataprojecten en een businessperspectief van Congo tot België.'
+  "nl": {
+    "nav": [
+      "Projecten",
+      "Over mij",
+      "Ervaring",
+      "Contact"
+    ],
+    "skip": "Ga naar de inhoud",
+    "menu": "Navigatie openen",
+    "closeMenu": "Navigatie sluiten",
+    "language": "Taal van de website",
+    "theme": "Weergave wijzigen",
+    "latte": "Licht",
+    "espresso": "Donker",
+    "availability": "Op zoek naar een datastage · 2027",
+    "location": "Mechelen, België",
+    "heroTop": "Data-analyse & business intelligence",
+    "heroTitle": [
+      "Nathan",
+      "Gatse"
+    ],
+    "heroDescription": "Student aan Thomas More in Mechelen. Ik gebruik Python, SQL en BI-tools om datapipelines en dashboards te bouwen.",
+    "workCta": "Bekijk projecten",
+    "cvCta": "Download cv",
+    "disciplines": [
+      "Data-analyse",
+      "Business intelligence",
+      "Data-engineering",
+      "Open data"
+    ],
+    "workEyebrow": "01 / PROJECTEN",
+    "workTitle": "Geselecteerde projecten",
+    "workDescription": "Data-engineering, analyse en applicaties. Elk project beschrijft de aanpak, tools en resultaten.",
+    "filters": [
+      "Alle projecten",
+      "Data-engineering",
+      "Analyse",
+      "Applicaties"
+    ],
+    "details": "Bekijk project",
+    "source": "Bekijk de code",
+    "caseStudy": "Projectdetails",
+    "close": "Project sluiten",
+    "context": "Doel",
+    "approach": "Aanpak",
+    "outcome": "Resultaat",
+    "tools": "Tools",
+    "githubMore": "Bekijk GitHub",
+    "team": "Teamproject",
+    "discuss": "Dit project bespreken",
+    "aboutEyebrow": "02 / OVER MIJ",
+    "aboutTitle": "Over mij",
+    "aboutParagraphs": [
+      "Ik kom uit de Republiek Congo en woon in Mechelen, België. Ik studeer International Business Management aan Thomas More, met de specialisatie International Applied Data Intelligence.",
+      "Mijn projecten gaan over Afrikaanse handel, digitale ontwikkeling en openbare data. Tijdens mijn stage bij Exco CACOGES in Brazzaville ondersteunde ik ook financiële audits."
+    ],
+    "linkedinCta": "Bekijk mijn LinkedIn-profiel",
+    "languageTitle": "Talen",
+    "languages": [
+      "Engels",
+      "Frans",
+      "Nederlands"
+    ],
+    "fluency": [
+      "Vloeiend",
+      "Vloeiend",
+      "Basiskennis"
+    ],
+    "skillsTitle": "Vaardigheden",
+    "skillTabs": [
+      "Analyse",
+      "Data-engineering",
+      "Samenwerking"
+    ],
+    "skillDescriptions": [
+      "Data-analyse, KPI-definities en rapportage.",
+      "Datapipelines, tests en modellering van datawarehouses.",
+      "Behoefteanalyse, prototyping en samenwerking in projecten."
+    ],
+    "journeyEyebrow": "03 / ACHTERGROND",
+    "journeyTitle": "Ervaring en opleiding",
+    "experience": "Ervaring",
+    "education": "Opleiding",
+    "certifications": "Certificaten",
+    "present": "2025 — heden",
+    "auditTitle": "Auditstagiair",
+    "auditPlace": "Exco CACOGES · Brazzaville, Republiek Congo",
+    "auditBody": "Analyseerde financiële klantgegevens, identificeerde aansluitingsfouten, onderhield Excel-consolidatiemodellen en ondersteunde risicobeoordelingen onder begeleiding van senior auditors.",
+    "schoolTitle": "International Business Management",
+    "schoolSubtitle": "International Applied Data Intelligence · Thomas More",
+    "schoolBody": "Professionele bachelor in Mechelen, met internationaal bedrijfsbeheer en toegepaste data-intelligentie. Gestart in februari 2025.",
+    "kuTitle": "Studie handelsingenieur",
+    "kuBody": "Vakken gevolgd aan KU Leuven vóór de overstap naar Thomas More; geen diploma behaald.",
+    "ibTitle": "International Baccalaureate-diploma",
+    "ibBody": "St. John’s International School · Waterloo, België",
+    "cvTitle": "Curriculum vitae",
+    "cvDescription": "Download mijn cv in het Engels of Frans.",
+    "englishCV": "Engels cv",
+    "frenchCV": "Frans cv",
+    "contactEyebrow": "04 / CONTACT",
+    "contactTitle": [
+      "Contact",
+      ""
+    ],
+    "contactDescription": "Voor mogelijkheden in data-analyse, business intelligence of een stage in 2027 kunt u mij via e-mail of LinkedIn bereiken.",
+    "internshipDetail": "Op zoek naar een stage in 2027. Een stageovereenkomst via de hogeschool is beschikbaar.",
+    "top": "Terug naar boven",
+    "description": "Nathan Gatse — student data-analyse en business intelligence aan Thomas More. Projecten, ervaring, opleiding en cv."
   }
 };
+
 export const skillGroups = [
- ['Python', 'pandas', 'NumPy', 'SQL', 'Power BI', 'Metabase', 'Excel', 'Power Query'],
- ['dbt', 'Databricks', 'Delta Lake', 'PostgreSQL', 'Airflow', 'Prefect', 'Docker', 'GitHub Actions'],
- ['Git', 'REST APIs', 'Agile', '4VISO']
+  [
+    "Python",
+    "pandas",
+    "NumPy",
+    "SQL",
+    "Power BI",
+    "Metabase",
+    "Excel",
+    "Power Query"
+  ],
+  [
+    "dbt",
+    "Databricks",
+    "Delta Lake",
+    "PostgreSQL",
+    "Airflow",
+    "Prefect",
+    "Docker",
+    "GitHub Actions"
+  ]
 ];
-const l = (en, fr, nl) => ({ en, fr, nl });
+
 export const projects = [
- { id:'cemac-ecowas-aes-trade-observatory', title:'CEMAC–ECOWAS–AES', subtitle:l('Trade Observatory','Observatoire commercial','Handelsobservatorium'), category:'analytics', visual:'trade', featured:true, stack:['Python','SQL','Databricks','Delta Lake','GitHub Actions'], metrics:l('21 countries · 1990–2024','21 pays · 1990–2024','21 landen · 1990–2024'), summary:l('A lakehouse connecting African trade, conflict, and fragility data.','Un lakehouse reliant commerce africain, conflits et fragilité.','Een lakehouse dat Afrikaanse handels-, conflict- en fragiliteitsdata verbindt.'), context:l('How can fragmented datasets reveal a clearer picture of regional trade?','Comment des sources dispersées peuvent-elles éclairer les échanges régionaux ?','Hoe kunnen verspreide datasets regionale handel inzichtelijker maken?'), approach:l('Integrated IMF, UN Comtrade, ACLED, and fragility datasets in Databricks. Modelled bronze, silver, and gold Delta tables with a star-schema analytics layer and automated quality checks.','Intégration des données FMI, UN Comtrade, ACLED et de fragilité dans Databricks. Modélisation de tables Delta bronze, silver et gold, avec schéma en étoile et contrôles qualité automatisés.','Integreerde IMF-, UN Comtrade-, ACLED- en fragiliteitsgegevens in Databricks. Modelleerde bronze-, silver- en gold-Delta-tabellen met een stermodel en geautomatiseerde kwaliteitscontroles.'), outcome:l('A lakehouse covering 21 countries and trade history from 1990 to 2024, with validated JSON exports to a public dashboard through GitHub Actions.','Un lakehouse couvrant 21 pays et la période 1990–2024, avec exports JSON validés vers un tableau de bord public via GitHub Actions.','Een lakehouse voor 21 landen en de periode 1990–2024, met gevalideerde JSON-exports naar een openbaar dashboard via GitHub Actions.') },
- { id:'cemac-data-observatory', title:'CEMAC', subtitle:l('Digital Readiness Pipeline','Pipeline de préparation numérique','Digital Readiness Pipeline'), category:'engineering', visual:'pipeline', featured:true, stack:['Python','SQL','PostgreSQL','dbt','Prefect','Metabase','Docker'], metrics:l('8 countries · 10 indicators','8 pays · 10 indicateurs','8 landen · 10 indicatoren'), summary:l('World Bank data becomes a tested warehouse and comparative dashboards.','Les données de la Banque mondiale deviennent un entrepôt testé et des tableaux de bord comparatifs.','Wereldbankgegevens worden een getest datawarehouse en vergelijkende dashboards.'), context:l('How can CEMAC economies compare progress in digital readiness?','Comment comparer les progrès numériques des économies de la CEMAC ?','Hoe kunnen CEMAC-economieën hun digitale ontwikkeling vergelijken?'), approach:l('Built an ELT pipeline ingesting 10 World Bank indicators for six CEMAC countries, plus Rwanda and Kenya. dbt tests the PostgreSQL warehouse, Prefect runs weekly refreshes, and Metabase serves the dashboards.','Pipeline ELT ingérant 10 indicateurs pour six pays de la CEMAC, plus le Rwanda et le Kenya. Entrepôt PostgreSQL testé avec dbt, actualisations hebdomadaires orchestrées par Prefect et tableaux de bord Metabase.','Bouwde een ELT-pipeline met 10 Wereldbankindicatoren voor zes CEMAC-landen, Rwanda en Kenia. dbt test het PostgreSQL-warehouse, Prefect verzorgt wekelijkse updates en Metabase toont de dashboards.'), outcome:l('Comparative readiness KPIs that make regional indicators easier for non-technical readers to explore.','Des KPI comparatifs qui rendent les indicateurs régionaux accessibles à un public non technique.','Vergelijkende KPI’s die regionale indicatoren toegankelijker maken voor niet-technische lezers.') },
- { id:'4viso', title:'4VISO', subtitle:l('Pharmaceutical logistics','Logistique pharmaceutique','Farmaceutieke logistiek'), category:'applications', visual:'logistics', team:true, stack:['Requirements analysis','Prototyping','GDP compliance'], metrics:l('Client-facing team project','Projet d’équipe avec un client','Teamproject met een klant'), summary:l('A working prototype for shipment tracking and GDP audit workflows.','Un prototype de suivi des expéditions et d’audits BPD/GDP.','Een werkend prototype voor zendingen en GDP-auditprocessen.'), context:l('How can regulatory requirements become usable logistics workflows?','Comment transformer les exigences réglementaires en parcours logistiques utilisables ?','Hoe vertaal je wettelijke eisen naar bruikbare logistieke processen?'), approach:l('Worked with the client team to analyse requirements, translate compliance needs into product features, and build a functional prototype.','Analyse des besoins avec l’équipe cliente, traduction des exigences de conformité en fonctionnalités et création d’un prototype fonctionnel.','Werkte met het klantenteam aan behoefteanalyse, vertaalde compliance-eisen naar productfuncties en bouwde een functioneel prototype.'), outcome:l('A prototype supporting shipment tracking and Good Distribution Practice audit workflows.','Un prototype pour le suivi des expéditions et les audits de Bonnes Pratiques de Distribution.','Een prototype voor zendingtracking en auditprocessen volgens Good Distribution Practice.') },
- { id:'NatuurSpotter', title:'NatuurSpotter', subtitle:l('Biodiversity, made visible','La biodiversité, rendue visible','Biodiversiteit in beeld'), category:'analytics', visual:'nature', stack:['Python','pandas','Folium','matplotlib','PyPI'], metrics:l('Python package · West Flanders','Package Python · Flandre-Occidentale','Python-package · West-Vlaanderen'), summary:l('Moth observations become maps, species reports, and seasonal insights.','Des observations de papillons de nuit transformées en cartes, rapports et analyses saisonnières.','Waarnemingen van nachtvlinders worden kaarten, soortenrapporten en seizoensinzichten.'), context:l('How can observation records become useful biodiversity information?','Comment rendre les observations utiles à la compréhension de la biodiversité ?','Hoe maak je observaties bruikbaar voor biodiversiteitsonderzoek?'), approach:l('Built a reusable Python package that collects observations, analyses biodiversity, and generates interactive Folium maps, PDF species reports, and seasonal charts.','Création d’un package Python réutilisable pour collecter les observations, analyser la biodiversité et produire des cartes Folium, des rapports PDF et des graphiques saisonniers.','Bouwde een herbruikbaar Python-package voor observatieverzameling, biodiversiteitsanalyse, interactieve Folium-kaarten, PDF-soortenrapporten en seizoensgrafieken.'), outcome:l('A published package turning environmental data into maps and reports that are easier to explore.','Un package publié qui transforme les données environnementales en cartes et rapports accessibles.','Een gepubliceerd package dat milieugegevens omzet in toegankelijke kaarten en rapporten.') },
- { id:'telco-regulator-pipeline', title:'Telecom', subtitle:l('Regulatory data platform','Plateforme de données réglementaires','Platform voor regulatordata'), category:'engineering', visual:'telco', stack:['Python','Airflow','dbt','PostgreSQL','MinIO','Docker'], metrics:l('Synthetic operator data','Données d’opérateurs synthétiques','Synthetische operatordata'), summary:l('A reference pipeline modelling a regulator’s reporting and validation needs.','Un pipeline de référence modélisant les besoins de reporting et validation d’un régulateur.','Een referentiepipeline voor rapportage en validatie door een telecomregulator.'), context:l('How can a regulator validate and analyse reports from multiple operators?','Comment un régulateur peut-il valider les rapports de plusieurs opérateurs ?','Hoe kan een regulator rapporten van meerdere operators valideren en analyseren?'), approach:l('Created synthetic submissions and a medallion warehouse, with validation rules, dbt marts, object storage, and Airflow orchestration.','Création de soumissions synthétiques et d’un entrepôt médaillon avec règles de validation, marts dbt, stockage objet et orchestration Airflow.','Maakte synthetische inzendingen en een medallion-warehouse met validatieregels, dbt-marts, objectopslag en Airflow-orkestratie.'), outcome:l('A reference system demonstrating traceable ingestion, data-quality checks, and analytics-ready models.','Un système de référence démontrant une ingestion traçable, des contrôles qualité et des modèles prêts pour l’analyse.','Een referentiesysteem met traceerbare ingestie, kwaliteitscontroles en analyseklare modellen.') },
- { id:'realtime-data-platform', title:'Real-time', subtitle:l('Event-driven data platform','Plateforme événementielle','Eventgedreven dataplatform'), category:'engineering', visual:'stream', stack:['Kafka','Spark','Cassandra','Airflow','Docker'], metrics:l('From events to analytical storage','Des événements au stockage analytique','Van events naar analytische opslag'), summary:l('A containerised streaming pipeline for processing user events.','Un pipeline de streaming conteneurisé pour traiter les événements utilisateurs.','Een streamingpipeline in containers voor het verwerken van gebruikersevents.'), context:l('How can user events move through a complete streaming pipeline?','Comment faire circuler les événements dans un pipeline de streaming complet ?','Hoe doorlopen gebruikersevents een complete streamingpipeline?'), approach:l('Kafka producers feed events into Spark Structured Streaming; transformed records land in Cassandra, with Airflow coordinating the pipeline.','Des producteurs Kafka alimentent Spark Structured Streaming ; les données transformées arrivent dans Cassandra et Airflow coordonne le pipeline.','Kafka-producers sturen events naar Spark Structured Streaming; getransformeerde records landen in Cassandra, met Airflow als coördinator.'), outcome:l('A hands-on demonstration of event-driven processing across distributed components.','Une démonstration concrète du traitement événementiel avec des composants distribués.','Een praktische demonstratie van eventverwerking met gedistribueerde componenten.') },
- { id:'Smart-Meal-Fitness-Tracker', title:'Smart Meal', subtitle:l('Meal & fitness tracker','Suivi nutrition & activité','Voeding & fitness bijhouden'), category:'applications', visual:'meal', stack:['C#','.NET 8','WPF','Supabase','USDA API','Gemini'], metrics:l('Windows desktop application','Application Windows','Windows-desktopapplicatie'), summary:l('Nutrition data and personal tracking in a desktop application.','Données nutritionnelles et suivi personnel dans une application de bureau.','Voedingsgegevens en persoonlijke tracking in een desktopapplicatie.'), context:l('How can nutrition data support daily meal and activity tracking?','Comment les données nutritionnelles peuvent-elles accompagner le suivi quotidien ?','Hoe kunnen voedingsgegevens dagelijkse tracking ondersteunen?'), approach:l('Built a WPF application with authentication and storage, nutrition API integration, and AI-assisted meal recommendations.','Application WPF avec authentification, stockage, API nutritionnelle et recommandations de repas assistées par IA.','Bouwde een WPF-applicatie met authenticatie, opslag, een voedings-API en AI-ondersteunde maaltijdaanbevelingen.'), outcome:l('A personal workflow for meals, activity, weight, and calorie goals.','Un suivi personnel des repas, activités, poids et objectifs caloriques.','Een persoonlijke workflow voor maaltijden, activiteit, gewicht en caloriedoelen.') },
- { id:'spotify-inspiration-lab-staged', title:'Spotify Inspiration Lab', subtitle:l('Learning through domain modelling','Apprendre par la modélisation','Leren door domeinmodellering'), category:'applications', visual:'music', stack:['C#','.NET 9','OOP'], metrics:l('Console learning project','Projet pédagogique en console','Leerproject in de console'), summary:l('A staged C# project exploring songs, albums, artists, and playlists.','Un projet C# progressif autour des chansons, albums, artistes et playlists.','Een stapsgewijs C#-project met nummers, albums, artiesten en afspeellijsten.'), context:l('How can music concepts become a clean object-oriented model?','Comment modéliser proprement les concepts d’une application musicale ?','Hoe maak je een helder objectmodel voor muziekconcepten?'), approach:l('Modelled core entities with seeded demonstration data and a staged commit history.','Modélisation des entités principales avec des données de démonstration et un historique de commits progressif.','Modelleerde kernentiteiten met demonstratiedata en een stapsgewijze commitgeschiedenis.'), outcome:l('Practice in object modelling and small-system design.','Un exercice de modélisation objet et de conception de petits systèmes.','Oefening in objectmodellering en ontwerp van kleine systemen.') }
-].map(p => ({...p, url:p.id==='4viso' ? null : `${CONTACT.github}/${p.id}`}));
+  {
+    "id": "cemac-ecowas-aes-trade-observatory",
+    "title": "CEMAC–ECOWAS–AES",
+    "subtitle": {
+      "en": "Trade Observatory",
+      "fr": "Observatoire commercial",
+      "nl": "Handelsobservatorium"
+    },
+    "category": "analytics",
+    "stack": [
+      "Python",
+      "SQL",
+      "Databricks",
+      "Delta Lake",
+      "GitHub Actions"
+    ],
+    "metrics": {
+      "en": "21 countries · 1990–2024",
+      "fr": "21 pays · 1990–2024",
+      "nl": "21 landen · 1990–2024"
+    },
+    "summary": {
+      "en": "A lakehouse connecting African trade, conflict, and fragility data.",
+      "fr": "Un lakehouse reliant commerce africain, conflits et fragilité.",
+      "nl": "Een lakehouse dat Afrikaanse handels-, conflict- en fragiliteitsdata verbindt."
+    },
+    "context": {
+      "en": "How can fragmented datasets reveal a clearer picture of regional trade?",
+      "fr": "Comment des sources dispersées peuvent-elles éclairer les échanges régionaux ?",
+      "nl": "Hoe kunnen verspreide datasets regionale handel inzichtelijker maken?"
+    },
+    "approach": {
+      "en": "Integrated IMF, UN Comtrade, ACLED, and fragility datasets in Databricks. Modelled bronze, silver, and gold Delta tables with a star-schema analytics layer and automated quality checks.",
+      "fr": "Intégration des données FMI, UN Comtrade, ACLED et de fragilité dans Databricks. Modélisation de tables Delta bronze, silver et gold, avec schéma en étoile et contrôles qualité automatisés.",
+      "nl": "Integreerde IMF-, UN Comtrade-, ACLED- en fragiliteitsgegevens in Databricks. Modelleerde bronze-, silver- en gold-Delta-tabellen met een stermodel en geautomatiseerde kwaliteitscontroles."
+    },
+    "outcome": {
+      "en": "A lakehouse covering 21 countries and trade history from 1990 to 2024, with validated JSON exports to a public dashboard through GitHub Actions.",
+      "fr": "Un lakehouse couvrant 21 pays et la période 1990–2024, avec exports JSON validés vers un tableau de bord public via GitHub Actions.",
+      "nl": "Een lakehouse voor 21 landen en de periode 1990–2024, met gevalideerde JSON-exports naar een openbaar dashboard via GitHub Actions."
+    },
+    "url": "https://github.com/mintyfizz/cemac-ecowas-aes-trade-observatory"
+  },
+  {
+    "id": "cemac-data-observatory",
+    "title": "CEMAC",
+    "subtitle": {
+      "en": "Digital Readiness Pipeline",
+      "fr": "Pipeline de préparation numérique",
+      "nl": "Digital Readiness Pipeline"
+    },
+    "category": "engineering",
+    "stack": [
+      "Python",
+      "SQL",
+      "PostgreSQL",
+      "dbt",
+      "Prefect",
+      "Metabase",
+      "Docker"
+    ],
+    "metrics": {
+      "en": "8 countries · 10 indicators",
+      "fr": "8 pays · 10 indicateurs",
+      "nl": "8 landen · 10 indicatoren"
+    },
+    "summary": {
+      "en": "World Bank data becomes a tested warehouse and comparative dashboards.",
+      "fr": "Les données de la Banque mondiale deviennent un entrepôt testé et des tableaux de bord comparatifs.",
+      "nl": "Wereldbankgegevens worden een getest datawarehouse en vergelijkende dashboards."
+    },
+    "context": {
+      "en": "How can CEMAC economies compare progress in digital readiness?",
+      "fr": "Comment comparer les progrès numériques des économies de la CEMAC ?",
+      "nl": "Hoe kunnen CEMAC-economieën hun digitale ontwikkeling vergelijken?"
+    },
+    "approach": {
+      "en": "Built an ELT pipeline ingesting 10 World Bank indicators for six CEMAC countries, plus Rwanda and Kenya. dbt tests the PostgreSQL warehouse, Prefect runs weekly refreshes, and Metabase serves the dashboards.",
+      "fr": "Pipeline ELT ingérant 10 indicateurs pour six pays de la CEMAC, plus le Rwanda et le Kenya. Entrepôt PostgreSQL testé avec dbt, actualisations hebdomadaires orchestrées par Prefect et tableaux de bord Metabase.",
+      "nl": "Bouwde een ELT-pipeline met 10 Wereldbankindicatoren voor zes CEMAC-landen, Rwanda en Kenia. dbt test het PostgreSQL-warehouse, Prefect verzorgt wekelijkse updates en Metabase toont de dashboards."
+    },
+    "outcome": {
+      "en": "Comparative readiness KPIs that make regional indicators easier for non-technical readers to explore.",
+      "fr": "Des KPI comparatifs qui rendent les indicateurs régionaux accessibles à un public non technique.",
+      "nl": "Vergelijkende KPI’s die regionale indicatoren toegankelijker maken voor niet-technische lezers."
+    },
+    "url": "https://github.com/mintyfizz/cemac-data-observatory"
+  },
+  {
+    "id": "4viso",
+    "title": "4VISO",
+    "subtitle": {
+      "en": "Pharmaceutical logistics",
+      "fr": "Logistique pharmaceutique",
+      "nl": "Farmaceutieke logistiek"
+    },
+    "category": "applications",
+    "team": true,
+    "stack": [
+      "Requirements analysis",
+      "Prototyping",
+      "GDP compliance"
+    ],
+    "metrics": {
+      "en": "Client-facing team project",
+      "fr": "Projet d’équipe avec un client",
+      "nl": "Teamproject met een klant"
+    },
+    "summary": {
+      "en": "A working prototype for shipment tracking and GDP audit workflows.",
+      "fr": "Un prototype de suivi des expéditions et d’audits BPD/GDP.",
+      "nl": "Een werkend prototype voor zendingen en GDP-auditprocessen."
+    },
+    "context": {
+      "en": "How can regulatory requirements become usable logistics workflows?",
+      "fr": "Comment transformer les exigences réglementaires en parcours logistiques utilisables ?",
+      "nl": "Hoe vertaal je wettelijke eisen naar bruikbare logistieke processen?"
+    },
+    "approach": {
+      "en": "Worked with the client team to analyse requirements, translate compliance needs into product features, and build a functional prototype.",
+      "fr": "Analyse des besoins avec l’équipe cliente, traduction des exigences de conformité en fonctionnalités et création d’un prototype fonctionnel.",
+      "nl": "Werkte met het klantenteam aan behoefteanalyse, vertaalde compliance-eisen naar productfuncties en bouwde een functioneel prototype."
+    },
+    "outcome": {
+      "en": "A prototype supporting shipment tracking and Good Distribution Practice audit workflows.",
+      "fr": "Un prototype pour le suivi des expéditions et les audits de Bonnes Pratiques de Distribution.",
+      "nl": "Een prototype voor zendingtracking en auditprocessen volgens Good Distribution Practice."
+    },
+    "url": null
+  },
+  {
+    "id": "NatuurSpotter",
+    "title": "NatuurSpotter",
+    "subtitle": {
+      "en": "Biodiversity, made visible",
+      "fr": "La biodiversité, rendue visible",
+      "nl": "Biodiversiteit in beeld"
+    },
+    "category": "analytics",
+    "stack": [
+      "Python",
+      "pandas",
+      "Folium",
+      "matplotlib",
+      "PyPI"
+    ],
+    "metrics": {
+      "en": "Python package · West Flanders",
+      "fr": "Package Python · Flandre-Occidentale",
+      "nl": "Python-package · West-Vlaanderen"
+    },
+    "summary": {
+      "en": "Moth observations become maps, species reports, and seasonal insights.",
+      "fr": "Des observations de papillons de nuit transformées en cartes, rapports et analyses saisonnières.",
+      "nl": "Waarnemingen van nachtvlinders worden kaarten, soortenrapporten en seizoensinzichten."
+    },
+    "context": {
+      "en": "How can observation records become useful biodiversity information?",
+      "fr": "Comment rendre les observations utiles à la compréhension de la biodiversité ?",
+      "nl": "Hoe maak je observaties bruikbaar voor biodiversiteitsonderzoek?"
+    },
+    "approach": {
+      "en": "Built a reusable Python package that collects observations, analyses biodiversity, and generates interactive Folium maps, PDF species reports, and seasonal charts.",
+      "fr": "Création d’un package Python réutilisable pour collecter les observations, analyser la biodiversité et produire des cartes Folium, des rapports PDF et des graphiques saisonniers.",
+      "nl": "Bouwde een herbruikbaar Python-package voor observatieverzameling, biodiversiteitsanalyse, interactieve Folium-kaarten, PDF-soortenrapporten en seizoensgrafieken."
+    },
+    "outcome": {
+      "en": "A published package turning environmental data into maps and reports that are easier to explore.",
+      "fr": "Un package publié qui transforme les données environnementales en cartes et rapports accessibles.",
+      "nl": "Een gepubliceerd package dat milieugegevens omzet in toegankelijke kaarten en rapporten."
+    },
+    "url": "https://github.com/mintyfizz/NatuurSpotter"
+  }
+];
